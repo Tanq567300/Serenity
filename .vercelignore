@@ -1,0 +1,14 @@
+# Ignore backend for frontend deployment
+backend/
+node_modules/
+*.log
+.env
+.env.local
+.env.production
+.env.staging
+.env.test
+
+# Ignore development files
+src/
+public/
+vite.config.js
