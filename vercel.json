@@ -2,18 +2,18 @@
   "version": 2,
   "builds": [
     {
-      "src": "frontend/vite.config.js",
+      "src": "frontend/package.json",
       "use": "@vercel/static-build",
-      "config": { "distDir": "frontend/dist" }
+      "config": { "distDir": "dist" }
     },
     {
-      "src": "backend/api/chat.js",
+      "src": "backend/server.js",
       "use": "@vercel/node"
     }
   ],
   "rewrites": [
-    { "source": "/api/chat", "destination": "/backend/api/chat.js" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/api/(.*)", "destination": "/backend/server.js" },
+    { "source": "/(.*)", "destination": "/frontend/dist/index.html" }
   ]
 }
 
