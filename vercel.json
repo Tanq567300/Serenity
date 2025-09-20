@@ -1,13 +1,19 @@
 {
   "version": 2,
-  "buildCommand": "cd frontend && npm install && npm run build",
-  "outputDirectory": "frontend/dist",
-  "installCommand": "npm install",
-  "framework": "vite",
-  "rewrites": [
+  "builds": [
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "src": "frontend/vite.config.js",
+      "use": "@vercel/static-build",
+      "config": { "distDir": "frontend/dist" }
+    },
+    {
+      "src": "backend/api/chat.js",
+      "use": "@vercel/node"
     }
+  ],
+  "rewrites": [
+    { "source": "/api/chat", "destination": "/backend/api/chat.js" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
+
