@@ -2,7 +2,7 @@
 
 A modern mental wellness application with AI-powered chat and mood tracking features, built with React and Express.
 
-Link: sereni-ai.vercel.app 
+Link: [sereni-ai.vercel.app ](https://sereni-ai.vercel.app/)
 
 ## 🏗️ Project Structure
 
