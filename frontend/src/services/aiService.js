@@ -2,8 +2,10 @@
 class AIService {
   constructor() {
     this.isReady = true;
-    // Always use the backend server URL
-    this.apiUrl = 'http://localhost:3000/api/chat';
+    // Use relative URL for deployed version, localhost for development
+    const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+    this.apiUrl = isProduction ? '/api/chat' : 'http://localhost:3000/api/chat';
+    console.log('AI Service initialized with URL:', this.apiUrl);
   }
 
   async init() {
