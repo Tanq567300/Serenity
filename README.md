@@ -2,6 +2,8 @@
 
 A modern mental wellness application with AI-powered chat and mood tracking features, built with React and Express.
 
+Link: https://sereni-ai-git-main-swayam-prakash-pandas-projects.vercel.app/  
+
 ## 🏗️ Project Structure
 
 ```
