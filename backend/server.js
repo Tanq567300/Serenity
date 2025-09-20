@@ -33,23 +33,14 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Serve static files in production
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../frontend/dist')));
+// Serve static files in production - This part is handled by vercel.json now
+// if (process.env.NODE_ENV === 'production') {
+//   app.use(express.static(path.join(__dirname, '../frontend/dist')));
   
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
-  });
-}
+//   app.get('*', (req, res) => {
+//     res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+//   });
+// }
 
-app.listen(PORT, () => {
-  console.log(`🚀 Backend server running on http://localhost:${PORT}`);
-  console.log(`📡 API endpoint: http://localhost:${PORT}/api/chat`);
-  console.log(`🏥 Health check: http://localhost:${PORT}/api/health`);
-  
-  if (!process.env.GEMINI_API_KEY) {
-    console.warn('⚠️  WARNING: GEMINI_API_KEY not found in environment variables');
-    console.warn('   The AI chat functionality will not work without this key');
-    console.warn('   Create a .env file in the backend folder with: GEMINI_API_KEY=your_key_here');
-  }
-});
+// Export the app for Vercel
+export default app;

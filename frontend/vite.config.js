@@ -17,7 +17,9 @@ export default defineConfig({
           return chunkInfo.name === 'sw' ? 'sw.js' : 'assets/[name]-[hash].js';
         }
       }
-    }
+    },
+    target: 'esnext',
+    minify: 'esbuild'
   },
   server: {
     headers: {
