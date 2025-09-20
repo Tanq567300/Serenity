@@ -1,5 +1,4 @@
-# Ignore backend for frontend deployment
-backend/
+# Ignore development files and build outputs
 node_modules/
 *.log
 .env
@@ -8,7 +7,7 @@ node_modules/
 .env.staging
 .env.test
 
-# Ignore development files
-src/
-public/
-vite.config.js
+# Ignore existing build output (will be regenerated)
+frontend/dist/
+
+# Keep all source files - they're needed for the build
