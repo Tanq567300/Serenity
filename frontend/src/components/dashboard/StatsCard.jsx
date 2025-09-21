@@ -21,10 +21,10 @@ const StatsCard = ({ title, value, subtitle, trend, color = 'blue', icon: IconCo
   };
 
   return (
-    <div className="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-200 p-3 sm:p-6 hover:shadow-md transition-shadow duration-200">
-      <div className="flex items-center justify-between mb-2 sm:mb-4">
-        <div className={`p-1.5 sm:p-2 rounded-lg ${colorClasses[color]}`}>
-          {IconComponent && <IconComponent className="w-4 h-4 sm:w-6 sm:h-6" />}
+    <div className="bg-white rounded-lg lg:rounded-xl shadow-sm border border-gray-200 p-3 lg:p-6 hover:shadow-md transition-shadow duration-200">
+      <div className="flex items-center justify-between mb-2 lg:mb-4">
+        <div className={`p-1.5 lg:p-2 rounded-md lg:rounded-lg ${colorClasses[color]}`}>
+          {IconComponent && <IconComponent className="w-4 h-4 lg:w-6 lg:h-6" />}
         </div>
         {trend && (
           <div className="flex items-center">
@@ -33,10 +33,10 @@ const StatsCard = ({ title, value, subtitle, trend, color = 'blue', icon: IconCo
         )}
       </div>
       
-      <div className="space-y-1 sm:space-y-2">
-        <h3 className="text-xs sm:text-sm font-medium text-gray-600 uppercase tracking-wide">{title}</h3>
-        <div className="text-lg sm:text-2xl font-bold text-gray-900">{value}</div>
-        {subtitle && <p className="text-xs sm:text-sm text-gray-500">{subtitle}</p>}
+      <div className="space-y-1 lg:space-y-2">
+        <h3 className="text-xs lg:text-sm font-medium text-gray-600 uppercase tracking-wide truncate">{title}</h3>
+        <div className="text-lg lg:text-2xl font-bold text-gray-900 truncate">{value}</div>
+        {subtitle && <p className="text-xs lg:text-sm text-gray-500 line-clamp-2">{subtitle}</p>}
       </div>
     </div>
   );

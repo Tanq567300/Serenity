@@ -30,26 +30,26 @@ const QuickActions = ({ onNavigate }) => {
   ];
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
-      <div className="space-y-3">
+    <div className="bg-white rounded-lg lg:rounded-xl shadow-sm border border-gray-200 p-3 lg:p-6">
+      <h3 className="text-base lg:text-lg font-semibold text-gray-900 mb-3 lg:mb-4">Quick Actions</h3>
+      <div className="space-y-2 lg:space-y-3">
         {actions.map(action => {
           const IconComponent = action.icon;
           return (
             <button
               key={action.id}
               onClick={action.action}
-              className={`w-full flex items-center p-4 rounded-lg ${action.color} text-white transition-colors duration-200 group`}
+              className={`w-full flex items-center p-3 lg:p-4 rounded-md lg:rounded-lg ${action.color} text-white transition-colors duration-200 group`}
             >
-              <div className="flex-shrink-0 mr-4">
-                <IconComponent className="w-6 h-6" />
+              <div className="flex-shrink-0 mr-3 lg:mr-4">
+                <IconComponent className="w-5 h-5 lg:w-6 lg:h-6" />
               </div>
-              <div className="text-left">
-                <div className="font-medium">{action.title}</div>
-                <div className="text-sm opacity-90">{action.description}</div>
+              <div className="text-left flex-1 min-w-0">
+                <div className="font-medium text-sm lg:text-base truncate">{action.title}</div>
+                <div className="text-xs lg:text-sm opacity-90 line-clamp-1">{action.description}</div>
               </div>
               <div className="ml-auto">
-                <svg className="w-5 h-5 transform group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 lg:w-5 lg:h-5 transform group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </div>

@@ -52,9 +52,9 @@ const DashboardHome = ({ moodData, chatStats, onNavigate }) => {
   const recentActivities = getRecentActivity();
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 lg:space-y-6">
       {/* Stats Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-6">
         <StatsCard
           title="Today's Mood"
           value={moodData?.today?.label || 'Not set'}
@@ -90,7 +90,7 @@ const DashboardHome = ({ moodData, chatStats, onNavigate }) => {
       </div>
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
         {/* Mood Overview */}
         <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-6">
