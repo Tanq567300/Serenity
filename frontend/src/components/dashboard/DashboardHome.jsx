@@ -53,7 +53,7 @@ const DashboardHome = ({ moodData, chatStats, onNavigate }) => {
   const recentActivities = getRecentActivity();
 
   return (
-    <div className="space-y-10 lg:space-y-12 h-full flex flex-col p-8 lg:p-12">
+    <div className="space-y-10 lg:space-y-12 h-full flex flex-col">
       {/* Stats Cards Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10">
         <StatsCard
@@ -90,8 +90,11 @@ const DashboardHome = ({ moodData, chatStats, onNavigate }) => {
         />
       </div>
 
-      {/* Main Content Grid - Takes remaining space */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-12 flex-1 min-h-0">
+      {/*    Content Grid - Takes remaining space */}
+      <div 
+        className="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-12 flex-1 min-h-0" 
+        style={{ paddingTop: '30px' }}
+      >
         {/* Mood Calendar */}
         <div className="lg:col-span-2 flex flex-col">
           <div className="flex items-center justify-between mb-6">

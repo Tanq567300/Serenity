@@ -88,12 +88,20 @@ function App() {
         />
         
         {/* Content Area */}
-        <main className="flex-1 overflow-y-auto pb-24 lg:pb-8">
+        <main 
+          className="flex-1 overflow-y-auto pb-24 lg:pb-8" 
+          style={{ 
+            paddingTop: '30px', 
+            paddingLeft: '30px', 
+            paddingRight: '30px', 
+            paddingBottom: '30px' 
+          }}
+        >
           {renderActiveTab()}
         </main>
-      </div>
-      
-      {/* Bottom Navigation - Mobile Only */}
+              </div>
+              
+              {/* Bottom Navigation - Mobile Only */}
       <BottomNavigation 
         activeSection={activeTab}
         onNavigate={handleNavigate}

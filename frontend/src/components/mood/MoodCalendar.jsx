@@ -97,7 +97,15 @@ const MoodCalendar = ({ moodData = {} }) => {
   const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
+    <div 
+      className="bg-white rounded-2xl shadow-lg border border-gray-100" 
+      style={{ 
+        paddingTop: '20px', 
+        paddingLeft: '20px', 
+        paddingRight: '20px', 
+        paddingBottom: '20px' 
+      }}
+    >
       {/* Calendar Header */}
       <div className="flex items-center justify-between mb-8">
         <h3 className="text-xl font-semibold text-gray-900">
@@ -209,7 +217,7 @@ const MoodCalendar = ({ moodData = {} }) => {
         
         {/* Quick Stats */}
         {moodData?.history && moodData.history.length > 0 && (
-          <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-green-50 rounded-xl">
+          <div className="mt-6 bg-gradient-to-r from-blue-50 to-green-50 rounded-xl" style={{ paddingTop: '5px', paddingLeft: '5px', paddingRight: '5px', paddingBottom: '5px' }}>
             <div className="grid grid-cols-3 gap-4 text-center">
               <div>
                 <div className="text-lg font-semibold text-gray-900">

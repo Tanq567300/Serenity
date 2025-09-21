@@ -29,22 +29,25 @@ const StatsCard = ({ title, value, subtitle, trend, color = 'blue', icon: IconCo
   };
 
   return (
-    <div className="bg-white rounded-2xl lg:rounded-3xl shadow-lg border border-gray-100 p-6 lg:p-8 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-      <div className="flex items-center justify-between mb-6 lg:mb-8">
+    <div 
+      className="bg-white rounded-2xl lg:rounded-3xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+      style={{ paddingTop: '10px', paddingLeft: '10px', paddingRight: '10px', paddingBottom: '10px' }}
+    >
+      <div className="flex items-center justify-between mb-8 lg:mb-12">
         <div 
-          className={`p-4 lg:p-5 rounded-2xl lg:rounded-3xl text-white shadow-md`}
+          className={`p-5 lg:p-6 rounded-2xl lg:rounded-3xl text-white shadow-md`}
           style={{ background: iconBgColors[color] }}
         >
           {IconComponent && <IconComponent className="w-6 h-6 lg:w-8 lg:h-8" />}
         </div>
         {trend && (
-          <div className="flex items-center bg-gray-50 rounded-xl p-3">
+          <div className="flex items-center bg-gray-50 rounded-xl p-4">
             {getTrendIcon()}
           </div>
         )}
       </div>
       
-      <div className="space-y-3 lg:space-y-4">
+      <div className="space-y-4 lg:space-y-6">
         <h3 className="text-sm lg:text-lg font-semibold text-gray-600 uppercase tracking-wide">{title}</h3>
         <div className="text-2xl lg:text-4xl font-bold text-gray-900">{value}</div>
         {subtitle && <p className="text-base lg:text-lg text-gray-500 leading-relaxed">{subtitle}</p>}
