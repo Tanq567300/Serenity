@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Sidebar from './components/common/Sidebar';
 import Header from './components/common/Header';
+import BottomNavigation from './components/common/BottomNavigation';
 import DashboardHome from './components/dashboard/DashboardHome';
 import ChatInterface from './components/chat/ChatInterface';
 import MoodTracker from './components/mood/MoodTracker';
@@ -92,10 +93,16 @@ function App() {
         />
         
         {/* Content Area */}
-        <main className="flex-1 overflow-y-auto p-4 lg:p-6">
+        <main className="flex-1 overflow-y-auto p-4 lg:p-6 pb-20 lg:pb-4">
           {renderActiveTab()}
         </main>
       </div>
+      
+      {/* Bottom Navigation - Mobile Only */}
+      <BottomNavigation 
+        activeSection={activeTab}
+        onNavigate={handleNavigate}
+      />
     </div>
   );
 }
