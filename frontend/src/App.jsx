@@ -16,6 +16,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [isModelLoading, setIsModelLoading] = useState(false);
   const [modelError, setModelError] = useState(null);
+  const [serverStatus, setServerStatus] = useState('unknown'); // 'connected' | 'offline' | 'unknown'
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -35,6 +36,31 @@ function App() {
       sender: 'ai',
       timestamp: Date.now()
     }]);
+  }, []);
+
+  // Health check: poll backend /api/health to determine if server and Gemini are reachable
+  useEffect(() => {
+    let cancelled = false;
+
+    const checkHealth = async () => {
+      try {
+        const res = await fetch('/api/health', { method: 'GET' });
+        if (!res.ok) throw new Error(`status:${res.status}`);
+        const data = await res.json();
+        if (!cancelled) setServerStatus('connected');
+      } catch (err) {
+        if (!cancelled) setServerStatus('offline');
+      }
+    };
+
+    // Initial check and periodic polling
+    checkHealth();
+    const interval = setInterval(checkHealth, 15_000); // poll every 15s
+
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
   }, []);
 
   const handleSendMessage = async () => {
@@ -155,10 +181,22 @@ function App() {
                 ❌ Service issue: {modelError}
               </div>
             )}
-            
-            {isModelReady && (
+
+            {serverStatus === 'connected' && (
               <div className="model-status ready">
                 ✅ Connected to AI assistant
+              </div>
+            )}
+
+            {serverStatus === 'offline' && (
+              <div className="model-status error">
+                ❌ Backend unreachable — AI chat offline
+              </div>
+            )}
+
+            {serverStatus === 'unknown' && (
+              <div className="model-status">
+                ⚪ Checking server status...
               </div>
             )}
           </>
