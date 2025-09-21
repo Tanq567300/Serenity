@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import rateLimit from 'express-rate-limit';
 
 // ES module equivalent of __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -18,11 +19,22 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
+// Rate limiting for chat endpoint
+const chatLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 50, // Limit each IP to 50 requests per windowMs
+  message: {
+    error: 'Too many requests from this IP, please try again later.'
+  },
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+});
+
 // Import the API handler
 import chatHandler from './api/chat.js';
 
 // API Routes
-app.post('/api/chat', chatHandler);
+app.post('/api/chat', chatLimiter, chatHandler);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -32,15 +44,6 @@ app.get('/api/health', (req, res) => {
     environment: process.env.NODE_ENV || 'development'
   });
 });
-
-// Serve static files in production - This part is handled by vercel.json now
-// if (process.env.NODE_ENV === 'production') {
-//   app.use(express.static(path.join(__dirname, '../frontend/dist')));
-  
-//   app.get('*', (req, res) => {
-//     res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
-//   });
-// }
 
 // Export the app for Vercel
 export default app;
