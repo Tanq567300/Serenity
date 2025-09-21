@@ -30,8 +30,11 @@ const chatLimiter = rateLimit({
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 });
 
-// Import the API handler
-import chatHandler from './api/chat.js';
+// Import the API handler dynamically AFTER dotenv.config() so that
+// `process.env` (including GEMINI_API_KEY from a local .env) is available
+// when `./api/chat.js` is evaluated. Static `import` statements are
+// hoisted and would otherwise run before `dotenv.config()`.
+const { default: chatHandler } = await import('./api/chat.js');
 
 // API Routes
 app.post('/api/chat', chatLimiter, chatHandler);
@@ -45,5 +48,21 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Export the app for Vercel
+// Start the server in local development (do NOT start a listener on Vercel).
+// Vercel sets the `VERCEL` environment variable; if it's present we must
+// not call `app.listen` because Vercel will import this app for serverless
+// handling. Locally `VERCEL` will be undefined and we should start the
+// HTTP listener so the frontend can call `http://localhost:3000`.
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`Server listening on port ${PORT} (env: ${process.env.NODE_ENV || 'development'})`);
+    if (process.env.GEMINI_API_KEY) {
+      console.log('Gemini API key detected in environment.');
+    } else {
+      console.log('Warning: GEMINI_API_KEY not set. AI chat will fall back to offline/default responses.');
+    }
+  });
+}
+
+// Export the app for Vercel (serverless) and for testing
 export default app;
