@@ -20,7 +20,7 @@ const MoodEntry = ({ onSubmit, todaysMood, isSubmitting }) => {
   const selectedMoodOption = moodOptions.find(option => option.value === currentMood);
 
   return (
-    <div className="bg-white rounded-lg lg:rounded-xl shadow-sm border border-gray-200 p-4 lg:p-6">
+    <div className="bg-white rounded-lg lg:rounded-xl shadow-sm border border-gray-200 p-4 lg:p-6" style={{marginBottom: '20px', paddingBottom: '20px', paddingTop: '20px', paddingLeft: '20px', paddingRight: '20px'}}>
       <div className="text-center mb-4 lg:mb-6">
         <h2 className="text-lg lg:text-xl font-semibold text-gray-900 mb-2">Daily Mood Check-in</h2>
         <p className="text-sm lg:text-base text-gray-600">How are you feeling today?</p>
@@ -66,7 +66,7 @@ const MoodEntry = ({ onSubmit, todaysMood, isSubmitting }) => {
           onChange={(e) => setMoodNote(e.target.value)}
           placeholder="Share what's on your mind..."
           maxLength={200}
-          className="w-full h-20 lg:h-24 p-3 text-sm lg:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
+          className="w-full h-20 lg:h-24 p-3 text-sm lg:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none bg-gray-100"
         />
         <div className="text-right text-xs text-gray-500 mt-1">
           {moodNote.length}/200 characters

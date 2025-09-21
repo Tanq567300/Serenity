@@ -7,19 +7,27 @@ import {
 
 const StatsCard = ({ title, value, subtitle, trend, color = 'blue', icon: IconComponent }) => {
   const colorClasses = {
-    blue: 'from-blue-50 to-blue-100 text-blue-700 border-blue-200',
-    green: 'from-green-50 to-green-100 text-green-700 border-green-200',
-    purple: 'from-purple-50 to-purple-100 text-purple-700 border-purple-200',
-    orange: 'from-orange-50 to-orange-100 text-orange-700 border-orange-200',
-    red: 'from-red-50 to-red-100 text-red-700 border-red-200'
+    blue: 'text-gray-700 border-gray-200',
+    green: 'text-gray-700 border-gray-200',
+    purple: 'text-gray-700 border-gray-200',
+    orange: 'text-gray-700 border-gray-200',
+    red: 'text-gray-700 border-gray-200'
+  };
+
+  const cardBackgrounds = {
+    blue: '#FFECC0',    // Primary Cream
+    green: '#FFC29B',   // Warm Orange
+    purple: '#F39F9F',  // Coral Pink
+    orange: '#B95E82',  // Deep Rose
+    red: '#F39F9F'      // Coral Pink
   };
 
   const iconBgColors = {
-    blue: 'linear-gradient(135deg, #647FBC 0%, #91ADC8 100%)',
-    green: 'linear-gradient(135deg, #AED6CF 0%, #91ADC8 100%)',
-    purple: 'linear-gradient(135deg, #91ADC8 0%, #647FBC 100%)',
-    orange: 'linear-gradient(135deg, #FAFDD6 0%, #AED6CF 100%)',
-    red: 'linear-gradient(135deg, #647FBC 0%, #91ADC8 100%)'
+    blue: '#FFECC0',
+    green: '#FFC29B',
+    purple: '#F39F9F',
+    orange: '#B95E82',
+    red: '#F39F9F'
   };
 
   const getTrendIcon = () => {
@@ -30,16 +38,16 @@ const StatsCard = ({ title, value, subtitle, trend, color = 'blue', icon: IconCo
 
   return (
     <div 
-      className="bg-white rounded-2xl lg:rounded-3xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
-      style={{ paddingTop: '10px', paddingLeft: '10px', paddingRight: '10px', paddingBottom: '10px' }}
+      className="rounded-2xl lg:rounded-3xl shadow-lg border border-gray-100 hover:shadow-lg transition-all duration-200"
+      style={{ 
+        paddingTop: '20px', 
+        paddingLeft: '20px', 
+        paddingRight: '20px', 
+        paddingBottom: '20px',
+        backgroundColor: cardBackgrounds[color]
+      }}
     >
       <div className="flex items-center justify-between mb-8 lg:mb-12">
-        <div 
-          className={`p-5 lg:p-6 rounded-2xl lg:rounded-3xl text-white shadow-md`}
-          style={{ background: iconBgColors[color] }}
-        >
-          {IconComponent && <IconComponent className="w-6 h-6 lg:w-8 lg:h-8" />}
-        </div>
         {trend && (
           <div className="flex items-center bg-gray-50 rounded-xl p-4">
             {getTrendIcon()}

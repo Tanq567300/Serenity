@@ -13,7 +13,7 @@ const MessageList = ({ messages, isLoading }) => {
   }, [messages, isLoading]);
 
   return (
-    <div className="flex-1 overflow-y-auto p-3 lg:p-6 space-y-3 lg:space-y-4">
+    <div className="flex-1 overflow-y-auto p-3 lg:p-6 space-y-3 lg:space-y-4" style={{paddingTop: '20px', paddingLeft: '20px', paddingBottom: '20px', paddingRight: '20px'}}>
       {messages.length === 0 ? (
         <div className="text-center py-8 lg:py-12 px-4">
           <div className="w-12 h-12 lg:w-16 lg:h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-3 lg:mb-4">

@@ -71,8 +71,8 @@ function App() {
   };
 
   return (
-    <div className="flex h-screen" style={{ background: 'linear-gradient(135deg, #FAFDD6 0%, #AED6CF 100%)' }}>
-      {/* Sidebar */}
+    <div className="flex h-screen" style={{ backgroundColor: '#F8F9FA' }}>
+      {/* Sidebar */} 
       <Sidebar 
         activeTab={activeTab} 
         setActiveTab={setActiveTab}
@@ -80,13 +80,6 @@ function App() {
       
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden lg:ml-0">
-        {/* Header */}
-        <Header 
-          activeTab={activeTab}
-          isModelReady={isModelReady}
-          modelError={modelError}
-        />
-        
         {/* Content Area */}
         <main 
           className="flex-1 overflow-y-auto pb-24 lg:pb-8" 
@@ -94,7 +87,8 @@ function App() {
             paddingTop: '30px', 
             paddingLeft: '30px', 
             paddingRight: '30px', 
-            paddingBottom: '30px' 
+            paddingBottom: '30px',
+            backgroundColor: '#F8F9FA'
           }}
         >
           {renderActiveTab()}

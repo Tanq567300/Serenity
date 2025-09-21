@@ -34,7 +34,7 @@ const MessageInput = ({ onSendMessage, isLoading, isModelReady, modelError }) =>
   return (
     <div className="border-t border-gray-200 bg-white p-3 lg:p-4">
       <div className="flex space-x-2 lg:space-x-4">
-        <div className="flex-1">
+        <div className="flex-1" style={{paddingLeft: '20px', paddingTop: '20px', paddingRight: '20px', paddingBottom: '20px'}}>
           <textarea
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
@@ -53,7 +53,20 @@ const MessageInput = ({ onSendMessage, isLoading, isModelReady, modelError }) =>
         <button
           onClick={handleSend}
           disabled={!inputText.trim() || isLoading || !isModelReady}
-          className="flex-shrink-0 bg-indigo-600 text-white p-2 lg:p-3 rounded-lg hover:bg-indigo-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors duration-200 flex items-center justify-center min-w-[40px] lg:min-w-[48px]"
+          className="flex-shrink-0 text-white p-2 lg:p-3 rounded-lg disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors duration-200 flex items-center justify-center min-w-[40px] lg:min-w-[48px]"
+          style={{
+            backgroundColor: !inputText.trim() || isLoading || !isModelReady ? '#9CA3AF' : '#F39F9F'
+          }}
+          onMouseEnter={(e) => {
+            if (!(!inputText.trim() || isLoading || !isModelReady)) {
+              e.target.style.backgroundColor = '#E67E7E';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!(!inputText.trim() || isLoading || !isModelReady)) {
+              e.target.style.backgroundColor = '#F39F9F';
+            }
+          }}
         >
           {isLoading ? (
             <div className="w-4 h-4 lg:w-5 lg:h-5 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
@@ -63,7 +76,7 @@ const MessageInput = ({ onSendMessage, isLoading, isModelReady, modelError }) =>
         </button>
       </div>
       
-      <div className="flex justify-between items-center mt-2 text-xs text-gray-500">
+      <div className="flex justify-between items-center mt-2 text-xs text-gray-500" style={{paddingLeft: '10px', paddingRight: '10px', paddingBottom: '10px'}}>
         <span className="hidden sm:inline">Press Enter to send, Shift+Enter for new line</span>
         <span className="sm:hidden">Enter to send</span>
         <span>{inputText.length}/1000</span>

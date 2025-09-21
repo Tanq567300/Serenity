@@ -7,7 +7,7 @@ const Header = ({ activeTab, isModelReady, modelError }) => {
       case 'dashboard': return 'Dashboard Overview';
       case 'chat': return 'AI Assistant';
       case 'mood': return 'Mood Tracker';
-      default: return 'Sereni AI';
+      default: return 'Mansik';
     }
   };
 

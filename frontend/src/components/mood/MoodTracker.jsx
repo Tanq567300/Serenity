@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import MoodEntry from './MoodEntry';
-import MoodChart from './MoodChart';
+import MoodCalendar from './MoodCalendar';
 import Streak from './Streak';
 import useMood from '../../hooks/useMood';
 
@@ -30,18 +30,23 @@ const MoodTracker = () => {
         isSubmitting={isSubmitting}
       />
 
-      {/* Chart Section */}
-      <MoodChart
-        chartData={chartData}
-        viewPeriod={viewPeriod}
-        onPeriodChange={setViewPeriod}
-      />
+      {/* Chart and Analytics Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Mood Calendar - Takes 1 column */}
+        <div>
+          <MoodCalendar 
+            moodData={chartData}
+          />
+        </div>
 
-      {/* Streak and Insights */}
-      <Streak
-        streakData={streakData}
-        trends={trends}
-      />
+        {/* Streak and Insights - Takes 1 column */}
+        <div>
+          <Streak
+            streakData={streakData}
+            trends={trends}
+          />
+        </div>
+      </div>
     </div>
   );
 };

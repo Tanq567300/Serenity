@@ -7,19 +7,19 @@ const BottomNavigation = ({ activeSection, onNavigate }) => {
       id: 'dashboard',
       label: 'Dashboard',
       icon: SimpleIcons.Home,
-      gradient: 'linear-gradient(135deg, #647FBC 0%, #91ADC8 100%)'
+      activeColor: '#FFC29B' // Warm Orange
     },
     {
       id: 'chat',
       label: 'Chat',
       icon: SimpleIcons.Chat,
-      gradient: 'linear-gradient(135deg, #91ADC8 0%, #AED6CF 100%)'
+      activeColor: '#F39F9F' // Coral Pink
     },
     {
       id: 'mood',
       label: 'Mood',
       icon: SimpleIcons.Smile,
-      gradient: 'linear-gradient(135deg, #AED6CF 0%, #FAFDD6 100%)'
+      activeColor: '#B95E82' // Deep Rose
     }
   ];
 
@@ -34,12 +34,12 @@ const BottomNavigation = ({ activeSection, onNavigate }) => {
             <button
               key={item.id}
               onClick={() => onNavigate(item.id)}
-              className={`flex flex-col items-center justify-center py-3 px-4 rounded-xl transition-all duration-300 min-w-0 flex-1 mx-2 transform ${
+              className={`flex flex-col items-center justify-center py-3 px-4 rounded-xl transition-all duration-200 min-w-0 flex-1 mx-2 transform ${
                 isActive 
-                  ? 'text-white shadow-lg scale-105' 
+                  ? 'text-white shadow-md scale-105' 
                   : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
               }`}
-              style={isActive ? { background: item.gradient } : {}}
+              style={isActive ? { backgroundColor: item.activeColor } : {}}
             >
               <IconComponent className="w-7 h-7 mb-2" />
               <span className="text-xs font-semibold">

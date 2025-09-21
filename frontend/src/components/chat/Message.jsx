@@ -34,12 +34,18 @@ const Message = ({ message, isLoading = false }) => {
         )}
       </div>
       
-      <div className="flex-1 max-w-[75%] lg:max-w-xs xl:max-w-md">
+      <div className="flex-1 max-w-[75%] lg:max-w-xs xl:max-w-md" style={{paddingLeft: '10px'}}>
         <div className={`rounded-lg px-3 py-2 lg:px-4 lg:py-3 ${
           isUser 
             ? 'bg-indigo-600 text-white' 
             : 'bg-gray-100 text-gray-900'
-        }`}>
+        }`} style={{
+          paddingTop: '10px', 
+          paddingLeft: '10px', 
+          paddingRight: '10px', 
+          paddingBottom: '10px',
+          ...(isUser && { marginRight: '10px' })
+        }}>
           <p className="text-xs lg:text-sm leading-relaxed whitespace-pre-wrap break-words">{message.text}</p>
         </div>
         

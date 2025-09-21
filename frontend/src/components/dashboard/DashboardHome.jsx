@@ -116,14 +116,14 @@ const DashboardHome = ({ moodData, chatStats, onNavigate }) => {
 
           {/* Mood Insights */}
           {moodData?.insights && moodData.insights.length > 0 && (
-            <div className="mt-8 rounded-2xl p-8 border border-green-100" style={{ background: 'linear-gradient(to right, rgba(174, 214, 207, 0.1), rgba(250, 253, 214, 0.2))' }}>
-              <h4 className="font-semibold text-green-900 mb-4 text-lg flex items-center">
+            <div className="mt-8 rounded-2xl p-8 border border-gray-200" style={{ background: '#FFECC0' }}>
+              <h4 className="font-semibold text-gray-800 mb-4 text-lg flex items-center">
                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                 </svg>
                 Latest Insight
               </h4>
-              <p className="text-green-800 text-base leading-relaxed">{moodData.insights[0]}</p>
+              <p className="text-gray-700 text-base leading-relaxed">{moodData.insights[0]}</p>
             </div>
           )}
         </div>
@@ -134,7 +134,10 @@ const DashboardHome = ({ moodData, chatStats, onNavigate }) => {
           <QuickActions onNavigate={onNavigate} />
           
           {/* Recent Activity */}
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-10 lg:p-12 flex-1 flex flex-col">
+          <div 
+            className="bg-white rounded-2xl shadow-lg border border-gray-100 flex-1 flex flex-col" 
+            style={{ marginTop: '20px', paddingTop: '10px', paddingLeft: '10px', paddingRight: '10px', paddingBottom: '10px' }}
+          >
             <h3 className="text-xl font-semibold text-gray-900 mb-10">Recent Activity</h3>
             
             {recentActivities.length > 0 ? (
@@ -142,8 +145,19 @@ const DashboardHome = ({ moodData, chatStats, onNavigate }) => {
                 {recentActivities.map(activity => {
                   const IconComponent = activity.icon;
                   return (
-                    <div key={activity.id} className="flex items-center space-x-8 p-8 bg-gradient-to-r from-gray-50 to-blue-50 rounded-2xl border border-gray-100 hover:shadow-md transition-all duration-200">
-                      <div className="flex-shrink-0 p-5 rounded-2xl" style={{ background: 'linear-gradient(135deg, #91ADC8 0%, #AED6CF 100%)' }}>
+                    <div 
+                      key={activity.id} 
+                      className="flex items-center space-x-8 rounded-2xl border border-gray-100 hover:shadow-md transition-all duration-200" 
+                      style={{ 
+                        background: 'rgb(255, 194, 155)', 
+                        padding: '10px', 
+                        marginTop: '10px', 
+                        marginLeft: '10px', 
+                        marginRight: '10px', 
+                        marginBottom: '10px' 
+                      }}
+                    >
+                      <div className="flex-shrink-0 p-5 rounded-2xl" style={{ background: '#B95E82' }}>
                         <IconComponent className="w-7 h-7 text-white" />
                       </div>
                       <div className="flex-1">
