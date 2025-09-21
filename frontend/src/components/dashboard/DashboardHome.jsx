@@ -1,6 +1,7 @@
 import React from 'react';
 import StatsCard from './StatsCard';
 import QuickActions from './QuickActions';
+import MoodCalendar from '../mood/MoodCalendar';
 import { SimpleIcons } from '../common/SimpleIcons';
 
 const DashboardHome = ({ moodData, chatStats, onNavigate }) => {
@@ -52,9 +53,9 @@ const DashboardHome = ({ moodData, chatStats, onNavigate }) => {
   const recentActivities = getRecentActivity();
 
   return (
-    <div className="space-y-6 lg:space-y-8 h-full flex flex-col">
+    <div className="space-y-10 lg:space-y-12 h-full flex flex-col p-8 lg:p-12">
       {/* Stats Cards Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10">
         <StatsCard
           title="Today's Mood"
           value={moodData?.today?.label || 'Not set'}
@@ -90,91 +91,70 @@ const DashboardHome = ({ moodData, chatStats, onNavigate }) => {
       </div>
 
       {/* Main Content Grid - Takes remaining space */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 flex-1 min-h-0">
-        {/* Mood Overview */}
-        <div className="lg:col-span-2 bg-white rounded-xl shadow-lg border border-gray-100 p-8 flex flex-col">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-12 flex-1 min-h-0">
+        {/* Mood Calendar */}
+        <div className="lg:col-span-2 flex flex-col">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-semibold text-gray-900">Mood Overview</h3>
+            <h3 className="text-2xl font-semibold text-gray-900">Mood Overview</h3>
             <button 
               onClick={() => onNavigate('mood')}
-              className="text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors duration-200"
+              className="text-blue-600 hover:text-blue-800 text-base font-medium transition-colors duration-200 flex items-center space-x-2"
             >
-              View Details →
+              <span>Track Mood</span>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
             </button>
           </div>
           
-          {moodData?.history && moodData.history.length > 0 ? (
-            <div className="space-y-6 flex-1 flex flex-col">
-              {/* Mini mood chart */}
-              <div className="flex items-end space-x-3 h-48 bg-gradient-to-r from-blue-50 to-green-50 rounded-xl p-6 flex-1">
-                {moodData.history.slice(-7).map((entry, index) => (
-                  <div key={index} className="flex-1 flex flex-col items-center justify-end h-full">
-                    <div 
-                      className="w-full rounded-t-md transition-all duration-300 hover:opacity-80"
-                      style={{ 
-                        height: `${(entry.mood / 5) * 100}%`, 
-                        background: `linear-gradient(to top, #647FBC, #91ADC8)`
-                      }}
-                    ></div>
-                    <div className="text-sm text-gray-600 mt-3 font-medium">
-                      {new Date(entry.date).toLocaleDateString('en', { weekday: 'short' })}
-                    </div>
-                  </div>
-                ))}
-              </div>
-              
-              {moodData.insights && (
-                <div className="rounded-xl p-6 border border-green-100" style={{ background: 'linear-gradient(to right, rgba(174, 214, 207, 0.1), rgba(250, 253, 214, 0.2))' }}>
-                  <h4 className="font-semibold text-green-900 mb-3 text-lg">Latest Insight</h4>
-                  <p className="text-green-800 text-base leading-relaxed">{moodData.insights[0]}</p>
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="text-center py-12 flex-1 flex flex-col justify-center">
-              <SimpleIcons.Smile className="w-16 h-16 text-gray-400 mx-auto mb-6" />
-              <p className="text-gray-500 text-lg mb-6">Start tracking your mood to see insights here</p>
-              <button 
-                onClick={() => onNavigate('mood')}
-                className="mt-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-8 py-4 rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200 font-medium text-lg shadow-lg hover:shadow-xl"
-                style={{ background: 'linear-gradient(135deg, #647FBC 0%, #91ADC8 100%)' }}
-              >
-                Log First Mood
-              </button>
+          <div className="flex-1">
+            <MoodCalendar moodData={moodData} />
+          </div>
+
+          {/* Mood Insights */}
+          {moodData?.insights && moodData.insights.length > 0 && (
+            <div className="mt-8 rounded-2xl p-8 border border-green-100" style={{ background: 'linear-gradient(to right, rgba(174, 214, 207, 0.1), rgba(250, 253, 214, 0.2))' }}>
+              <h4 className="font-semibold text-green-900 mb-4 text-lg flex items-center">
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>
+                Latest Insight
+              </h4>
+              <p className="text-green-800 text-base leading-relaxed">{moodData.insights[0]}</p>
             </div>
           )}
         </div>
 
         {/* Right Column */}
-        <div className="space-y-6 flex flex-col h-full">
+        <div className="space-y-10 flex flex-col h-full">
           {/* Quick Actions */}
           <QuickActions onNavigate={onNavigate} />
           
           {/* Recent Activity */}
-          <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-8 flex-1 flex flex-col">
-            <h3 className="text-xl font-semibold text-gray-900 mb-6">Recent Activity</h3>
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-10 lg:p-12 flex-1 flex flex-col">
+            <h3 className="text-xl font-semibold text-gray-900 mb-10">Recent Activity</h3>
             
             {recentActivities.length > 0 ? (
-              <div className="space-y-4 flex-1">
+              <div className="space-y-8 flex-1">
                 {recentActivities.map(activity => {
                   const IconComponent = activity.icon;
                   return (
-                    <div key={activity.id} className="flex items-center space-x-4 p-4 bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl border border-gray-100 hover:shadow-md transition-all duration-200">
-                      <div className="flex-shrink-0 p-3 rounded-xl" style={{ background: 'linear-gradient(135deg, #91ADC8 0%, #AED6CF 100%)' }}>
-                        <IconComponent className="w-6 h-6 text-white" />
+                    <div key={activity.id} className="flex items-center space-x-8 p-8 bg-gradient-to-r from-gray-50 to-blue-50 rounded-2xl border border-gray-100 hover:shadow-md transition-all duration-200">
+                      <div className="flex-shrink-0 p-5 rounded-2xl" style={{ background: 'linear-gradient(135deg, #91ADC8 0%, #AED6CF 100%)' }}>
+                        <IconComponent className="w-7 h-7 text-white" />
                       </div>
                       <div className="flex-1">
-                        <p className="text-base text-gray-900 font-medium">{activity.message}</p>
-                        <p className="text-sm text-gray-500 mt-1">{activity.time}</p>
+                        <p className="text-base text-gray-900 font-medium mb-2">{activity.message}</p>
+                        <p className="text-sm text-gray-500">{activity.time}</p>
                       </div>
                     </div>
                   );
                 })}
               </div>
             ) : (
-              <div className="text-center py-12 flex-1 flex flex-col justify-center">
-                <p className="text-gray-500 text-lg mb-2">No recent activity</p>
-                <p className="text-gray-400 text-base">Start using the app to see your activity here</p>
+              <div className="text-center py-20 flex-1 flex flex-col justify-center">
+                <p className="text-gray-500 text-xl mb-4">No recent activity</p>
+                <p className="text-gray-400 text-lg">Start using the app to see your activity here</p>
               </div>
             )}
           </div>

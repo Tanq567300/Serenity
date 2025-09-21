@@ -88,7 +88,7 @@ function App() {
         />
         
         {/* Content Area */}
-        <main className="flex-1 overflow-y-auto p-6 lg:p-8 pb-24 lg:pb-8">
+        <main className="flex-1 overflow-y-auto pb-24 lg:pb-8">
           {renderActiveTab()}
         </main>
       </div>

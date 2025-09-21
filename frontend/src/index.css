@@ -165,3 +165,18 @@ textarea:focus-visible {
     display: none !important;
   }
 }
+
+/* Sidebar specific styles */
+.sidebar-gradient {
+  background: linear-gradient(135deg, #647FBC 0%, #91ADC8 50%, #AED6CF 100%) !important;
+  background-image: linear-gradient(135deg, #647FBC 0%, #91ADC8 50%, #AED6CF 100%) !important;
+}
+
+/* Override any Tailwind background utilities for sidebar */
+.sidebar-gradient.bg-gradient-to-b,
+.sidebar-gradient.from-indigo-600,
+.sidebar-gradient.via-purple-600,
+.sidebar-gradient.to-purple-700 {
+  background: linear-gradient(135deg, #647FBC 0%, #91ADC8 50%, #AED6CF 100%) !important;
+  background-image: linear-gradient(135deg, #647FBC 0%, #91ADC8 50%, #AED6CF 100%) !important;
+}

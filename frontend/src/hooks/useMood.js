@@ -25,12 +25,47 @@ const useMood = () => {
           console.warn('Invalid mood history data in localStorage, clearing...');
           localStorage.removeItem('moodHistory');
         }
+      } else {
+        // Generate sample data for testing if no data exists
+        const sampleData = generateSampleMoodData();
+        setMoodHistory(sampleData);
       }
     } catch (error) {
       console.error('Failed to load mood history from localStorage:', error);
       localStorage.removeItem('moodHistory');
     }
   }, []);
+
+  // Generate sample mood data for testing
+  const generateSampleMoodData = () => {
+    const sampleData = [];
+    const today = new Date();
+    
+    // Generate 30 days of sample data
+    for (let i = 0; i < 30; i++) {
+      const date = new Date(today);
+      date.setDate(today.getDate() - i);
+      
+      // Random mood between 1-5 with some bias towards 3-4
+      const moodValue = Math.random() < 0.1 ? 1 : 
+                       Math.random() < 0.2 ? 2 : 
+                       Math.random() < 0.4 ? 3 : 
+                       Math.random() < 0.7 ? 4 : 5;
+      
+      const moodOption = moodOptions.find(opt => opt.value === moodValue);
+      
+      sampleData.push({
+        id: Date.now() + i,
+        mood: moodValue,
+        label: moodOption.label,
+        note: `Sample mood entry for ${date.toLocaleDateString()}`,
+        date: date.toISOString().split('T')[0],
+        timestamp: date.getTime()
+      });
+    }
+    
+    return sampleData.reverse(); // Most recent first
+  };
 
   // Save mood history to localStorage
   useEffect(() => {
