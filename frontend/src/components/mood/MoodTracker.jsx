@@ -22,7 +22,7 @@ const MoodTracker = () => {
   const streakData = getCurrentStreak();
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 lg:space-y-6">
       {/* Mood Entry Section */}
       <MoodEntry
         onSubmit={submitMood}

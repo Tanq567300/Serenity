@@ -20,19 +20,19 @@ const Streak = ({ streakData, trends }) => {
   };
 
   const getTrendIcon = () => {
-    if (trends.trend === 'improving') return <SimpleIcons.TrendingUp className="w-5 h-5 text-green-500" />;
-    if (trends.trend === 'declining') return <SimpleIcons.TrendingDown className="w-5 h-5 text-red-500" />;
-    return <SimpleIcons.TrendingFlat className="w-5 h-5 text-gray-400" />;
+    if (trends.trend === 'improving') return <SimpleIcons.TrendingUp className="w-4 h-4 lg:w-5 lg:h-5 text-green-500" />;
+    if (trends.trend === 'declining') return <SimpleIcons.TrendingDown className="w-4 h-4 lg:w-5 lg:h-5 text-red-500" />;
+    return <SimpleIcons.TrendingFlat className="w-4 h-4 lg:w-5 lg:h-5 text-gray-400" />;
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 lg:space-y-4">
       {/* Streak Card */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="bg-white rounded-lg lg:rounded-xl shadow-sm border border-gray-200 p-4 lg:p-6">
         <div className="text-center">
-        <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full ${getStreakColor()} mb-4`}>
-          <SimpleIcons.Fire className="w-8 h-8" />
-        </div>          <h3 className="text-2xl font-bold text-gray-900 mb-1">
+        <div className={`inline-flex items-center justify-center w-12 h-12 lg:w-16 lg:h-16 rounded-full ${getStreakColor()} mb-3 lg:mb-4`}>
+          <SimpleIcons.Fire className="w-6 h-6 lg:w-8 lg:h-8" />
+        </div>          <h3 className="text-xl lg:text-2xl font-bold text-gray-900 mb-1">
             {days} {days === 1 ? 'Day' : 'Days'}
           </h3>
           
@@ -40,20 +40,20 @@ const Streak = ({ streakData, trends }) => {
             {type === 'positive' ? 'Positive Streak' : 'Current Streak'}
           </p>
           
-          <p className="text-sm text-gray-700">
+          <p className="text-sm text-gray-700 px-2">
             {getStreakMessage()}
           </p>
         </div>
       </div>
 
       {/* Trends Card */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">Mood Trends</h3>
+      <div className="bg-white rounded-lg lg:rounded-xl shadow-sm border border-gray-200 p-4 lg:p-6">
+        <div className="flex items-center justify-between mb-3 lg:mb-4">
+          <h3 className="text-base lg:text-lg font-semibold text-gray-900">Mood Trends</h3>
           {getTrendIcon()}
         </div>
         
-        <div className="space-y-3">
+        <div className="space-y-2 lg:space-y-3">
           <div className="flex justify-between items-center">
             <span className="text-sm text-gray-600">Overall trend:</span>
             <span className={`text-sm font-medium capitalize ${
@@ -76,14 +76,14 @@ const Streak = ({ streakData, trends }) => {
 
       {/* Insights */}
       {trends.insights && trends.insights.length > 0 && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Insights & Patterns</h3>
+        <div className="bg-white rounded-lg lg:rounded-xl shadow-sm border border-gray-200 p-4 lg:p-6">
+          <h3 className="text-base lg:text-lg font-semibold text-gray-900 mb-3 lg:mb-4">Insights & Patterns</h3>
           
-          <div className="space-y-3">
+          <div className="space-y-2 lg:space-y-3">
             {trends.insights.map((insight, index) => (
-              <div key={index} className="flex items-start space-x-3 p-3 bg-blue-50 rounded-lg">
-                <div className="flex-shrink-0 w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center mt-0.5">
-                  <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+              <div key={index} className="flex items-start space-x-2 lg:space-x-3 p-3 bg-blue-50 rounded-lg">
+                <div className="flex-shrink-0 w-5 h-5 lg:w-6 lg:h-6 bg-blue-100 rounded-full flex items-center justify-center mt-0.5">
+                  <div className="w-1.5 h-1.5 lg:w-2 lg:h-2 bg-blue-600 rounded-full"></div>
                 </div>
                 <p className="text-sm text-blue-800 leading-relaxed">{insight}</p>
               </div>
