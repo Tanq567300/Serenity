@@ -8,7 +8,7 @@ const QuickActions = ({ onNavigate }) => {
       title: 'Start Chat Session',
       description: 'Talk to your AI wellness companion',
       icon: SimpleIcons.Chat,
-      color: 'bg-blue-500 hover:bg-blue-600',
+      gradient: 'linear-gradient(135deg, #647FBC 0%, #91ADC8 100%)',
       action: () => onNavigate('chat')
     },
     {
@@ -16,41 +16,42 @@ const QuickActions = ({ onNavigate }) => {
       title: 'Log Today\'s Mood',
       description: 'Quick mood check-in',
       icon: SimpleIcons.Smile,
-      color: 'bg-green-500 hover:bg-green-600',
+      gradient: 'linear-gradient(135deg, #AED6CF 0%, #91ADC8 100%)',
       action: () => onNavigate('mood')
     },
     {
       id: 'journal',
       title: 'Write Journal Entry',
       description: 'Reflect on your day',
-      icon: SimpleIcons.Chart, // Using chart as a substitute for document
-      color: 'bg-purple-500 hover:bg-purple-600',
-      action: () => onNavigate('mood') // For now, redirect to mood tracker
+      icon: SimpleIcons.Chart,
+      gradient: 'linear-gradient(135deg, #91ADC8 0%, #647FBC 100%)',
+      action: () => onNavigate('mood')
     }
   ];
 
   return (
-    <div className="bg-white rounded-lg lg:rounded-xl shadow-sm border border-gray-200 p-3 lg:p-6">
-      <h3 className="text-base lg:text-lg font-semibold text-gray-900 mb-3 lg:mb-4">Quick Actions</h3>
-      <div className="space-y-2 lg:space-y-3">
+    <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 lg:p-8">
+      <h3 className="text-lg lg:text-xl font-semibold text-gray-900 mb-4 lg:mb-6">Quick Actions</h3>
+      <div className="space-y-4">
         {actions.map(action => {
           const IconComponent = action.icon;
           return (
             <button
               key={action.id}
               onClick={action.action}
-              className={`w-full flex items-center p-3 lg:p-4 rounded-md lg:rounded-lg ${action.color} text-white transition-colors duration-200 group`}
+              className="w-full flex items-center p-4 lg:p-5 rounded-xl text-white transition-all duration-300 group hover:shadow-lg transform hover:-translate-y-1"
+              style={{ background: action.gradient }}
             >
-              <div className="flex-shrink-0 mr-3 lg:mr-4">
-                <IconComponent className="w-5 h-5 lg:w-6 lg:h-6" />
+              <div className="flex-shrink-0 mr-4 lg:mr-5 p-2 rounded-lg bg-white/20">
+                <IconComponent className="w-6 h-6 lg:w-7 lg:h-7" />
               </div>
               <div className="text-left flex-1 min-w-0">
-                <div className="font-medium text-sm lg:text-base truncate">{action.title}</div>
-                <div className="text-xs lg:text-sm opacity-90 line-clamp-1">{action.description}</div>
+                <div className="font-semibold text-base lg:text-lg">{action.title}</div>
+                <div className="text-sm lg:text-base opacity-90 mt-1">{action.description}</div>
               </div>
-              <div className="ml-auto">
-                <svg className="w-4 h-4 lg:w-5 lg:h-5 transform group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              <div className="ml-auto p-2">
+                <svg className="w-5 h-5 lg:w-6 lg:h-6 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                 </svg>
               </div>
             </button>

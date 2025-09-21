@@ -7,11 +7,19 @@ import {
 
 const StatsCard = ({ title, value, subtitle, trend, color = 'blue', icon: IconComponent }) => {
   const colorClasses = {
-    blue: 'bg-blue-50 text-blue-700 border-blue-200',
-    green: 'bg-green-50 text-green-700 border-green-200',
-    purple: 'bg-purple-50 text-purple-700 border-purple-200',
-    orange: 'bg-orange-50 text-orange-700 border-orange-200',
-    red: 'bg-red-50 text-red-700 border-red-200'
+    blue: 'from-blue-50 to-blue-100 text-blue-700 border-blue-200',
+    green: 'from-green-50 to-green-100 text-green-700 border-green-200',
+    purple: 'from-purple-50 to-purple-100 text-purple-700 border-purple-200',
+    orange: 'from-orange-50 to-orange-100 text-orange-700 border-orange-200',
+    red: 'from-red-50 to-red-100 text-red-700 border-red-200'
+  };
+
+  const iconBgColors = {
+    blue: 'linear-gradient(135deg, #647FBC 0%, #91ADC8 100%)',
+    green: 'linear-gradient(135deg, #AED6CF 0%, #91ADC8 100%)',
+    purple: 'linear-gradient(135deg, #91ADC8 0%, #647FBC 100%)',
+    orange: 'linear-gradient(135deg, #FAFDD6 0%, #AED6CF 100%)',
+    red: 'linear-gradient(135deg, #647FBC 0%, #91ADC8 100%)'
   };
 
   const getTrendIcon = () => {
@@ -21,22 +29,25 @@ const StatsCard = ({ title, value, subtitle, trend, color = 'blue', icon: IconCo
   };
 
   return (
-    <div className="bg-white rounded-lg lg:rounded-xl shadow-sm border border-gray-200 p-3 lg:p-6 hover:shadow-md transition-shadow duration-200">
-      <div className="flex items-center justify-between mb-2 lg:mb-4">
-        <div className={`p-1.5 lg:p-2 rounded-md lg:rounded-lg ${colorClasses[color]}`}>
-          {IconComponent && <IconComponent className="w-4 h-4 lg:w-6 lg:h-6" />}
+    <div className="bg-white rounded-xl lg:rounded-2xl shadow-lg border border-gray-100 p-4 lg:p-8 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+      <div className="flex items-center justify-between mb-4 lg:mb-6">
+        <div 
+          className={`p-3 lg:p-4 rounded-xl lg:rounded-2xl text-white shadow-md`}
+          style={{ background: iconBgColors[color] }}
+        >
+          {IconComponent && <IconComponent className="w-5 h-5 lg:w-7 lg:h-7" />}
         </div>
         {trend && (
-          <div className="flex items-center">
+          <div className="flex items-center bg-gray-50 rounded-lg p-2">
             {getTrendIcon()}
           </div>
         )}
       </div>
       
-      <div className="space-y-1 lg:space-y-2">
-        <h3 className="text-xs lg:text-sm font-medium text-gray-600 uppercase tracking-wide truncate">{title}</h3>
-        <div className="text-lg lg:text-2xl font-bold text-gray-900 truncate">{value}</div>
-        {subtitle && <p className="text-xs lg:text-sm text-gray-500 line-clamp-2">{subtitle}</p>}
+      <div className="space-y-2 lg:space-y-3">
+        <h3 className="text-sm lg:text-base font-semibold text-gray-600 uppercase tracking-wide">{title}</h3>
+        <div className="text-xl lg:text-3xl font-bold text-gray-900">{value}</div>
+        {subtitle && <p className="text-sm lg:text-base text-gray-500 leading-relaxed">{subtitle}</p>}
       </div>
     </div>
   );

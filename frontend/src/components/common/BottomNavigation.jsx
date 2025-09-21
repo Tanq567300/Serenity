@@ -7,28 +7,25 @@ const BottomNavigation = ({ activeSection, onNavigate }) => {
       id: 'dashboard',
       label: 'Dashboard',
       icon: SimpleIcons.Home,
-      color: 'text-indigo-600',
-      bgColor: 'bg-indigo-50'
+      gradient: 'linear-gradient(135deg, #647FBC 0%, #91ADC8 100%)'
     },
     {
       id: 'chat',
       label: 'Chat',
       icon: SimpleIcons.Chat,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50'
+      gradient: 'linear-gradient(135deg, #91ADC8 0%, #AED6CF 100%)'
     },
     {
       id: 'mood',
       label: 'Mood',
       icon: SimpleIcons.Smile,
-      color: 'text-green-600',
-      bgColor: 'bg-green-50'
+      gradient: 'linear-gradient(135deg, #AED6CF 0%, #FAFDD6 100%)'
     }
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 lg:hidden">
-      <div className="flex justify-around items-center py-2">
+    <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-100 z-50 lg:hidden shadow-lg">
+      <div className="flex justify-around items-center py-3">
         {navItems.map((item) => {
           const IconComponent = item.icon;
           const isActive = activeSection === item.id;
@@ -37,14 +34,15 @@ const BottomNavigation = ({ activeSection, onNavigate }) => {
             <button
               key={item.id}
               onClick={() => onNavigate(item.id)}
-              className={`flex flex-col items-center justify-center py-2 px-3 rounded-lg transition-all duration-200 min-w-0 flex-1 mx-1 ${
+              className={`flex flex-col items-center justify-center py-3 px-4 rounded-xl transition-all duration-300 min-w-0 flex-1 mx-2 transform ${
                 isActive 
-                  ? `${item.color} ${item.bgColor}` 
-                  : 'text-gray-400 hover:text-gray-600'
+                  ? 'text-white shadow-lg scale-105' 
+                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
               }`}
+              style={isActive ? { background: item.gradient } : {}}
             >
-              <IconComponent className={`w-6 h-6 mb-1 ${isActive ? item.color : ''}`} />
-              <span className={`text-xs font-medium truncate ${isActive ? item.color : ''}`}>
+              <IconComponent className="w-7 h-7 mb-2" />
+              <span className="text-xs font-semibold">
                 {item.label}
               </span>
             </button>

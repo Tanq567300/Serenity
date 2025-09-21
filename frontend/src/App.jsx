@@ -71,7 +71,7 @@ function App() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen" style={{ background: 'linear-gradient(135deg, #FAFDD6 0%, #AED6CF 100%)' }}>
       {/* Sidebar */}
       <Sidebar 
         activeTab={activeTab} 
@@ -88,7 +88,7 @@ function App() {
         />
         
         {/* Content Area */}
-        <main className="flex-1 overflow-y-auto p-4 lg:p-6 pb-20 lg:pb-4">
+        <main className="flex-1 overflow-y-auto p-6 lg:p-8 pb-24 lg:pb-8">
           {renderActiveTab()}
         </main>
       </div>
