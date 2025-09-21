@@ -12,10 +12,13 @@ const __dirname = path.dirname(__filename);
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3002;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  credentials: true
+}));
 app.use(express.json());
 
 // Import the API handler
@@ -41,6 +44,15 @@ app.get('/api/health', (req, res) => {
 //     res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
 //   });
 // }
+
+// Start server locally (not needed for Vercel)
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`✅ Server running on http://localhost:${PORT}`);
+    console.log(`🚀 API endpoints available at http://localhost:${PORT}/api/`);
+    console.log(`🔑 Gemini API Key: ${process.env.GEMINI_API_KEY ? 'Configured ✅' : 'Missing ❌'}`);
+  });
+}
 
 // Export the app for Vercel
 export default app;
