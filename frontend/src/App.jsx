@@ -10,7 +10,6 @@ import useMood from './hooks/useMood';
 
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   // Chat functionality
   const {
@@ -77,8 +76,6 @@ function App() {
       <Sidebar 
         activeTab={activeTab} 
         setActiveTab={setActiveTab}
-        isMobileMenuOpen={isMobileMenuOpen}
-        setIsMobileMenuOpen={setIsMobileMenuOpen}
       />
       
       {/* Main Content */}
@@ -88,8 +85,6 @@ function App() {
           activeTab={activeTab}
           isModelReady={isModelReady}
           modelError={modelError}
-          isMobileMenuOpen={isMobileMenuOpen}
-          setIsMobileMenuOpen={setIsMobileMenuOpen}
         />
         
         {/* Content Area */}
