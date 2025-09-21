@@ -3,12 +3,13 @@ import Sidebar from './components/common/Sidebar';
 import Header from './components/common/Header';
 import DashboardHome from './components/dashboard/DashboardHome';
 import ChatInterface from './components/chat/ChatInterface';
-import MoodTracker from './components/MoodTracker';
+import MoodTracker from './components/mood/MoodTracker';
 import useChat from './hooks/useChat';
 import useMood from './hooks/useMood';
 
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   // Chat functionality
   const {
@@ -72,19 +73,26 @@ function App() {
   return (
     <div className="flex h-screen bg-gray-50">
       {/* Sidebar */}
-      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+      <Sidebar 
+        activeTab={activeTab} 
+        setActiveTab={setActiveTab}
+        isMobileMenuOpen={isMobileMenuOpen}
+        setIsMobileMenuOpen={setIsMobileMenuOpen}
+      />
       
       {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden lg:ml-0">
         {/* Header */}
         <Header 
           activeTab={activeTab}
           isModelReady={isModelReady}
           modelError={modelError}
+          isMobileMenuOpen={isMobileMenuOpen}
+          setIsMobileMenuOpen={setIsMobileMenuOpen}
         />
         
         {/* Content Area */}
-        <main className="flex-1 overflow-y-auto p-6">
+        <main className="flex-1 overflow-y-auto p-4 lg:p-6">
           {renderActiveTab()}
         </main>
       </div>
