@@ -1,6 +1,12 @@
-import React, { useState, useRef, useEffect } from 'react';
-import AIService from './services/aiService.js';
-import MoodTracker from './components/MoodTracker.jsx';
+import React, { useState } from 'react';
+import Sidebar from './components/common/Sidebar';
+import Header from './components/common/Header';
+import BottomNavigation from './components/common/BottomNavigation';
+import DashboardHome from './components/dashboard/DashboardHome';
+import ChatInterface from './components/chat/ChatInterface';
+import MoodTracker from './components/mood/MoodTracker';
+import useChat from './hooks/useChat';
+import useMood from './hooks/useMood';
 
 function App() {
   const [activeTab, setActiveTab] = useState('chat');
@@ -16,11 +22,10 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [isModelLoading, setIsModelLoading] = useState(false);
   const [modelError, setModelError] = useState(null);
-  const [serverStatus, setServerStatus] = useState('unknown'); // 'connected' | 'offline' | 'unknown'
   const messagesEndRef = useRef(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  const handleNavigate = (tab) => {
+    setActiveTab(tab);
   };
 
   useEffect(() => {
@@ -36,31 +41,6 @@ function App() {
       sender: 'ai',
       timestamp: Date.now()
     }]);
-  }, []);
-
-  // Health check: poll backend /api/health to determine if server and Gemini are reachable
-  useEffect(() => {
-    let cancelled = false;
-
-    const checkHealth = async () => {
-      try {
-        const res = await fetch('/api/health', { method: 'GET' });
-        if (!res.ok) throw new Error(`status:${res.status}`);
-        const data = await res.json();
-        if (!cancelled) setServerStatus('connected');
-      } catch (err) {
-        if (!cancelled) setServerStatus('offline');
-      }
-    };
-
-    // Initial check and periodic polling
-    checkHealth();
-    const interval = setInterval(checkHealth, 15_000); // poll every 15s
-
-    return () => {
-      cancelled = true;
-      clearInterval(interval);
-    };
   }, []);
 
   const handleSendMessage = async () => {
@@ -181,22 +161,10 @@ function App() {
                 ❌ Service issue: {modelError}
               </div>
             )}
-
-            {serverStatus === 'connected' && (
+            
+            {isModelReady && (
               <div className="model-status ready">
                 ✅ Connected to AI assistant
-              </div>
-            )}
-
-            {serverStatus === 'offline' && (
-              <div className="model-status error">
-                ❌ Backend unreachable — AI chat offline
-              </div>
-            )}
-
-            {serverStatus === 'unknown' && (
-              <div className="model-status">
-                ⚪ Checking server status...
               </div>
             )}
           </>

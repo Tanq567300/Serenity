@@ -13,10 +13,13 @@ const __dirname = path.dirname(__filename);
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3002;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  credentials: true
+}));
 app.use(express.json());
 
 // Rate limiting for chat endpoint
@@ -48,21 +51,14 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Start the server in local development (do NOT start a listener on Vercel).
-// Vercel sets the `VERCEL` environment variable; if it's present we must
-// not call `app.listen` because Vercel will import this app for serverless
-// handling. Locally `VERCEL` will be undefined and we should start the
-// HTTP listener so the frontend can call `http://localhost:3000`.
-if (!process.env.VERCEL) {
-  app.listen(PORT, () => {
-    console.log(`Server listening on port ${PORT} (env: ${process.env.NODE_ENV || 'development'})`);
-    if (process.env.GEMINI_API_KEY) {
-      console.log('Gemini API key detected in environment.');
-    } else {
-      console.log('Warning: GEMINI_API_KEY not set. AI chat will fall back to offline/default responses.');
-    }
-  });
-}
+// Serve static files in production - This part is handled by vercel.json now
+// if (process.env.NODE_ENV === 'production') {
+//   app.use(express.static(path.join(__dirname, '../frontend/dist')));
+  
+//   app.get('*', (req, res) => {
+//     res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+//   });
+// }
 
 // Export the app for Vercel (serverless) and for testing
 export default app;
