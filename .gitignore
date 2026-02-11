@@ -1,0 +1,6 @@
+# Ignore all markdown files
+*.md
+node_modules/
+# But keep README.md files
+!README.md
+!**/README.md
