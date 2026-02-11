@@ -5,6 +5,9 @@ const rateLimit = require('express-rate-limit');
 const morgan = require('morgan');
 const errorHandler = require('./middleware/errorHandler');
 const healthRoutes = require('./routes/health.routes');
+const authRoutes = require('./routes/auth.routes');
+
+const config = require('./config');
 
 const app = express();
 
@@ -12,7 +15,13 @@ const app = express();
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
-app.use(morgan('dev'));
+
+// Logging
+if (config.env === 'development') {
+    app.use(morgan('dev'));
+} else {
+    app.use(morgan('combined'));
+}
 
 // Rate Limiting
 const limiter = rateLimit({
@@ -23,11 +32,9 @@ app.use(limiter);
 
 // Routes
 app.use('/api/health', healthRoutes);
+app.use('/api/auth', authRoutes);
 
 // Placeholder Routes
-app.use('/api/auth', (req, res, next) => {
-    res.status(501).json({ message: "Not Implemented" });
-});
 app.use('/api/chat', (req, res, next) => {
     res.status(501).json({ message: "Not Implemented" });
 });
@@ -41,6 +48,14 @@ app.use('/api/export', (req, res, next) => {
     res.status(501).json({ message: "Not Implemented" });
 });
 
+
+// 404 Handler
+app.use((req, res, next) => {
+    res.status(404).json({
+        success: false,
+        message: 'Resource not found'
+    });
+});
 
 // Error Handler
 app.use(errorHandler);
