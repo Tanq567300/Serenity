@@ -35,9 +35,8 @@ app.use('/api/health', healthRoutes);
 app.use('/api/auth', authRoutes);
 
 // Placeholder Routes
-app.use('/api/chat', (req, res, next) => {
-    res.status(501).json({ message: "Not Implemented" });
-});
+const chatRoutes = require('./routes/chat.routes');
+app.use('/api/chat', chatRoutes);
 app.use('/api/mood', (req, res, next) => {
     res.status(501).json({ message: "Not Implemented" });
 });

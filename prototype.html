@@ -1,0 +1,1124 @@
+<!-- Serenity Dashboard -->
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Serenity - Mental Health Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#36e236",
+                        "background-light": "#fbfcfb",
+                        "background-dark": "#112111",
+                        "sage": "#e8f3e8",
+                        "lavender": "#f3e8f3",
+                        "cream": "#fdfbf7"
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "2xl": "2rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .glass {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .mood-glow {
+            box-shadow: 0 0 40px rgba(54, 226, 54, 0.25);
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-[#1a2e1a] antialiased">
+<div class="relative flex min-h-screen w-full flex-col max-w-md mx-auto bg-cream/50 overflow-x-hidden pb-24">
+<!-- Top Bar -->
+<header class="flex items-center justify-between px-6 pt-8 pb-4">
+<div class="flex flex-col">
+<p class="text-sm font-medium text-[#509550]/70 uppercase tracking-widest">Serenity</p>
+<h1 class="text-2xl font-bold text-[#0e1b0e]">Good Morning, Abhinav</h1>
+</div>
+<div class="size-10 rounded-full bg-sage flex items-center justify-center border border-white shadow-sm overflow-hidden">
+<img alt="Profile" data-alt="User profile picture of a smiling person" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDFWDxMWy5qHcRG6uajml4aSDOHROvpkpuQxlscGWLee5MCYFoSHdSno2yBtF570LevKt-jwQjdiitiTO_INS18kwJ6z0bIHttf8AiHc4NFniaFHzpsEBelhr21JUomsi8m8Fm6n9z7v6-5j5A7uf5H73uUDtMfuJdouO_L1N_7It7ZS__A9vPedXEQIWUD7O09nNWUBbOSbJvA2YiSr-8rD-KvU1_XhaIUXdAqGnV0BAmwpYp8x3QMhMRQVDXv7DjnBXlbcSrNxW6b"/>
+</div>
+</header>
+<!-- Mood Score Section -->
+<section class="px-6 py-6 flex flex-col items-center">
+<div class="relative flex items-center justify-center w-64 h-64">
+<!-- Outer Progress Ring (SVG) -->
+<svg class="absolute w-full h-full -rotate-90 transform" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="none" r="45" stroke="#e8f3e8" stroke-width="4"></circle>
+<circle cx="50" cy="50" fill="none" r="45" stroke="#36e236" stroke-dasharray="282.7" stroke-dashoffset="62.2" stroke-linecap="round" stroke-width="4"></circle>
+</svg>
+<!-- Glassmorphism Circle -->
+<div class="glass mood-glow w-48 h-48 rounded-full flex flex-col items-center justify-center shadow-xl">
+<span class="text-6xl font-bold text-[#0e1b0e]">78</span>
+<span class="text-xs font-semibold text-[#509550] uppercase tracking-wider">Mood Score</span>
+</div>
+<!-- Soft Glow Elements -->
+<div class="absolute -z-10 w-40 h-40 bg-primary/20 blur-[60px] rounded-full"></div>
+<div class="absolute -z-10 w-32 h-32 bg-lavender/40 blur-[50px] rounded-full translate-x-12 -translate-y-8"></div>
+</div>
+<p class="mt-4 text-sm text-gray-500 font-medium italic text-center px-8">"You're doing great today. Your mindfulness is paying off."</p>
+</section>
+<!-- AI Guide Section -->
+<section class="px-6 py-4">
+<div class="bg-sage/40 rounded-2xl p-5 border border-white relative shadow-sm">
+<div class="flex items-start gap-4">
+<div class="size-10 rounded-full bg-primary flex items-center justify-center text-white shadow-lg shadow-primary/30 shrink-0">
+<span class="material-symbols-outlined text-xl">auto_awesome</span>
+</div>
+<div class="flex-1">
+<h3 class="font-semibold text-[#0e1b0e] text-sm">Always-On AI Guide</h3>
+<p class="text-[#3a5a3a] text-lg leading-snug mt-1 font-medium">How are you feeling right now, Abhinav?</p>
+</div>
+</div>
+<div class="mt-4 flex gap-2">
+<button class="px-4 py-2 bg-white rounded-full text-xs font-semibold text-[#509550] border border-sage shadow-sm">I'm feeling calm</button>
+<button class="px-4 py-2 bg-white rounded-full text-xs font-semibold text-[#509550] border border-sage shadow-sm">A bit anxious</button>
+</div>
+<!-- Floating Chat Button -->
+<button class="absolute -bottom-4 -right-2 size-12 rounded-full bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/40 active:scale-95 transition-transform">
+<span class="material-symbols-outlined">chat_bubble</span>
+</button>
+</div>
+</section>
+<!-- Mood Journal Section -->
+<section class="px-6 py-6">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-lg font-bold text-[#0e1b0e]">Mood Journal</h3>
+<a class="text-xs font-bold text-primary uppercase tracking-wider" href="#">View All</a>
+</div>
+<div class="flex flex-col gap-4">
+<!-- Journal Card 1 -->
+<div class="flex gap-4 items-center bg-white rounded-xl p-4 border border-sage shadow-sm">
+<div class="size-12 rounded-lg bg-lavender flex items-center justify-center text-[#907090]">
+<span class="material-symbols-outlined">wb_twilight</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<h4 class="font-bold text-[#0e1b0e] text-sm">Morning Reflection</h4>
+<span class="text-[10px] font-medium text-gray-400">08:30 AM</span>
+</div>
+<p class="text-sm text-gray-500 mt-1 line-clamp-1">Calm and focused today...</p>
+</div>
+</div>
+<!-- Journal Card 2 -->
+<div class="flex gap-4 items-center bg-white rounded-xl p-4 border border-sage shadow-sm">
+<div class="size-12 rounded-lg bg-sage flex items-center justify-center text-[#509550]">
+<span class="material-symbols-outlined">favorite</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<h4 class="font-bold text-[#0e1b0e] text-sm">Gratitude List</h4>
+<span class="text-[10px] font-medium text-gray-400">Yesterday</span>
+</div>
+<p class="text-sm text-gray-500 mt-1 line-clamp-1">I am thankful for the morning sun...</p>
+</div>
+</div>
+<!-- Empty Entry Prompt -->
+<div class="border-2 border-dashed border-sage/60 rounded-xl p-6 flex flex-col items-center justify-center text-center">
+<span class="material-symbols-outlined text-sage text-4xl mb-2">add_circle</span>
+<p class="text-xs font-semibold text-[#509550]/60 uppercase tracking-widest">Add New Journal Entry</p>
+</div>
+</div>
+</section>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto glass border-t border-white/50 px-6 pb-6 pt-3 flex items-center justify-between z-50 rounded-t-3xl">
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined fill-1">home</span>
+<span class="text-[10px] font-bold">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-[#509550]/50" href="#">
+<span class="material-symbols-outlined">book_4</span>
+<span class="text-[10px] font-bold">Journal</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-[#509550]/50" href="#">
+<span class="material-symbols-outlined">temp_preferences_eco</span>
+<span class="text-[10px] font-bold">Insights</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-[#509550]/50" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-bold">Profile</span>
+</a>
+</nav>
+<!-- Background Blobs for Atmosphere -->
+<div class="fixed top-[-10%] right-[-20%] w-[300px] h-[300px] bg-sage/30 rounded-full blur-[100px] -z-20 pointer-events-none"></div>
+<div class="fixed bottom-[-5%] left-[-10%] w-[250px] h-[250px] bg-lavender/20 rounded-full blur-[80px] -z-20 pointer-events-none"></div>
+</div>
+</body></html>
+
+<!-- Serenity Login Screen -->
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Serenity - Login</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#36e236",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#112111",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .dawn-gradient {
+            background: linear-gradient(135deg, #fef3c7 0%, #e0f2fe 50%, #d1fae5 100%);
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .glow-button {
+            box-shadow: 0 0 20px rgba(54, 226, 54, 0.4);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-display bg-background-light dark:bg-background-dark min-h-screen flex items-center justify-center p-4">
+<!-- Background Layer -->
+<div class="fixed inset-0 dawn-gradient z-0"></div>
+<!-- Login Container -->
+<div class="relative z-10 w-full max-w-[420px] animate-fade-in">
+<!-- Header & Logo -->
+<div class="flex flex-col items-center mb-10">
+<div class="w-20 h-20 glass-panel rounded-full flex items-center justify-center mb-4 text-primary">
+<span class="material-symbols-outlined !text-5xl">spa</span>
+</div>
+<h1 class="text-3xl font-semibold text-slate-800 tracking-tight">Serenity</h1>
+<p class="text-slate-600 font-light mt-1">Find your inner peace.</p>
+</div>
+<!-- Form Card -->
+<div class="glass-panel rounded-xl p-8 shadow-xl">
+<form action="#" class="space-y-6">
+<!-- Email Field -->
+<div class="flex flex-col gap-2">
+<label class="text-slate-700 text-sm font-medium ml-1">Email</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl">mail</span>
+<input class="w-full bg-white/40 border border-white/50 rounded-lg py-4 pl-12 pr-4 text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all outline-none" placeholder="hello@serenity.com" type="email"/>
+</div>
+</div>
+<!-- Password Field -->
+<div class="flex flex-col gap-2">
+<div class="flex justify-between items-center px-1">
+<label class="text-slate-700 text-sm font-medium">Password</label>
+</div>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl">lock</span>
+<input class="w-full bg-white/40 border border-white/50 rounded-lg py-4 pl-12 pr-12 text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all outline-none" placeholder="••••••••" type="password"/>
+<button class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600" type="button">
+<span class="material-symbols-outlined text-xl">visibility</span>
+</button>
+</div>
+</div>
+<!-- Action Button -->
+<button class="w-full bg-primary text-slate-900 font-bold py-4 rounded-lg glow-button hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2" type="submit">
+<span>Login</span>
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<!-- Forgot Password -->
+<div class="text-center">
+<a class="text-sm text-slate-600 hover:text-primary transition-colors font-medium" href="#">Forgot Password?</a>
+</div>
+</form>
+<!-- Divider -->
+<div class="flex items-center gap-4 my-8">
+<div class="h-px bg-slate-300 flex-1"></div>
+<span class="text-xs text-slate-400 font-medium uppercase tracking-widest">Or continue with</span>
+<div class="h-px bg-slate-300 flex-1"></div>
+</div>
+<!-- Social Logins -->
+<div class="grid grid-cols-2 gap-4">
+<button class="flex items-center justify-center gap-2 py-3 px-4 rounded-lg border border-white/60 bg-white/20 hover:bg-white/40 transition-all text-slate-700 font-medium text-sm">
+<svg class="w-5 h-5" viewbox="0 0 24 24">
+<path d="M12.48 10.92v3.28h7.84c-.24 1.84-.908 3.152-1.928 4.176-1.024 1.024-2.624 2.144-5.912 2.144-5.32 0-9.432-4.32-9.432-9.6s4.112-9.6 9.432-9.6c2.88 0 5.056 1.136 6.616 2.616l2.312-2.312C19.168 1.48 16.272 0 12.48 0 5.8 0 0 5.4 0 12s5.8 12 12.48 12c3.704 0 6.616-1.216 8.872-3.576 2.312-2.312 3.032-5.528 3.032-8.152 0-.624-.048-1.224-.144-1.784H12.48z" fill="currentColor"></path>
+</svg>
+                    Google
+                </button>
+<button class="flex items-center justify-center gap-2 py-3 px-4 rounded-lg border border-white/60 bg-white/20 hover:bg-white/40 transition-all text-slate-700 font-medium text-sm">
+<svg class="w-5 h-5" viewbox="0 0 24 24">
+<path d="M17.05 20.28c-.98.95-2.05 1.72-3.23 2.31-1.18.59-2.36.88-3.54.88-1.18 0-2.3-.29-3.37-.88-1.07-.59-1.95-1.36-2.65-2.31-1.31-1.84-1.97-4.11-1.97-6.81 0-2.48.59-4.5 1.77-6.06 1.18-1.56 2.76-2.34 4.74-2.34.98 0 1.96.22 2.94.66.98.44 1.81.93 2.5 1.47.78-.69 1.67-1.23 2.67-1.62s2.03-.59 3.09-.59c1.67 0 3.09.49 4.26 1.47 1.17.98 1.96 2.35 2.37 4.11-1.18.49-2.11 1.25-2.79 2.28-.68 1.03-1.02 2.21-1.02 3.54 0 1.34.34 2.52 1.02 3.54.68 1.03 1.61 1.79 2.79 2.28-.13.56-.36 1.18-.69 1.86s-.72 1.28-1.17 1.81c-.59.69-1.31 1.04-2.16 1.04-.69 0-1.37-.16-2.04-.48-.67-.32-1.34-.48-2-.48s-1.33.16-2 .48c-.67.32-1.35.48-2.04.48-.85 0-1.57-.35-2.16-1.04zM12 5.05c0-1.11.41-2.07 1.22-2.88.81-.81 1.77-1.22 2.88-1.22.06 0 .15 0 .27.02.12.02.21.03.27.05-.13 1.21-.61 2.22-1.44 3.04s-1.83 1.23-3.04 1.23c-.06 0-.15 0-.27-.02-.12-.02-.21-.03-.27-.05.13-1.21.61-2.22 1.44-3.04.83-.82 1.84-1.23 3.04-1.23z" fill="currentColor"></path>
+</svg>
+                    Apple
+                </button>
+</div>
+</div>
+<!-- Footer Help -->
+<div class="mt-8 text-center">
+<p class="text-slate-500 text-sm">
+                New to Serenity? 
+                <a class="text-primary font-semibold hover:underline" href="#">Create an account</a>
+</p>
+</div>
+</div>
+<!-- Decorative Dawn Elements -->
+<div class="fixed bottom-0 left-0 right-0 h-1/4 bg-gradient-to-t from-white/30 to-transparent pointer-events-none"></div>
+<div class="fixed top-20 left-[10%] w-64 h-64 bg-orange-200/20 rounded-full blur-[100px] pointer-events-none"></div>
+<div class="fixed bottom-20 right-[10%] w-96 h-96 bg-sky-200/30 rounded-full blur-[120px] pointer-events-none"></div>
+</body></html>
+
+<!-- Profile Screen -->
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Serenity - Profile</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#36e236",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#112111",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .active-icon {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
+<!-- Header / Top Bar -->
+<header class="sticky top-0 z-10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md px-4 py-4 border-b border-primary/10">
+<div class="flex items-center justify-between max-w-md mx-auto w-full">
+<button class="p-2 hover:bg-primary/10 rounded-full transition-colors">
+<span class="material-symbols-outlined text-2xl">arrow_back</span>
+</button>
+<h1 class="text-lg font-semibold">Profile</h1>
+<button class="p-2 hover:bg-primary/10 rounded-full transition-colors">
+<span class="material-symbols-outlined text-2xl">settings</span>
+</button>
+</div>
+</header>
+<main class="flex-1 max-w-md mx-auto w-full pb-24">
+<!-- Profile Header Section -->
+<section class="flex flex-col items-center py-8 px-4">
+<div class="relative">
+<div class="size-32 rounded-full border-4 border-primary/20 p-1">
+<div class="size-full rounded-full bg-cover bg-center" data-alt="Portrait of a young man named Abhinav" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC4l4ZP8QfEHYeysThHgKnBfRF9d7tgFOwAYcWqzWU-UVr_jfz00nS6Y0NsMoFp5y5sl5zhWUZcgG3eD1sWU1ysepDNXOF3FNyItBcBK_n4RXhEGHnldYhDFM6b09ffoW_KlqDt4JgXbkBpBSkc9hgu4dZPh2Ez5Xc3fl7t4w3xBnT6oiq5Hrof7JdcoanS3Qyb116pVR4GtUcj1F91muWP6Ypr0AL6_FKitWFfBTWuUiSFItqywaI_K3xxc1dVheQz2p82VFLDrx2n')">
+</div>
+</div>
+<div class="absolute bottom-1 right-1 bg-primary text-white p-1.5 rounded-full border-2 border-background-light dark:border-background-dark shadow-sm">
+<span class="material-symbols-outlined text-xs block">verified</span>
+</div>
+</div>
+<h2 class="mt-4 text-2xl font-bold tracking-tight">Abhinav</h2>
+<div class="mt-2 flex items-center gap-2 bg-primary/10 px-3 py-1 rounded-full">
+<span class="material-symbols-outlined text-primary text-sm active-icon">workspace_premium</span>
+<span class="text-xs font-bold uppercase tracking-wider text-primary">Premium Member</span>
+</div>
+<p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Member since May 2023</p>
+</section>
+<!-- Menu Items -->
+<section class="px-4 space-y-2">
+<h3 class="px-2 text-xs font-bold uppercase tracking-[0.1em] text-slate-400 dark:text-slate-500 mb-4">Account &amp; Safety</h3>
+<a class="flex items-center gap-4 bg-white dark:bg-white/5 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-white/5 hover:border-primary/30 transition-all group" href="#">
+<div class="size-10 flex items-center justify-center bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
+<span class="material-symbols-outlined text-primary">person</span>
+</div>
+<span class="flex-1 font-medium text-slate-700 dark:text-slate-200">Account Settings</span>
+<span class="material-symbols-outlined text-slate-400">chevron_right</span>
+</a>
+<a class="flex items-center gap-4 bg-white dark:bg-white/5 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-white/5 hover:border-primary/30 transition-all group" href="#">
+<div class="size-10 flex items-center justify-center bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
+<span class="material-symbols-outlined text-primary">notifications</span>
+</div>
+<span class="flex-1 font-medium text-slate-700 dark:text-slate-200">Notification Preferences</span>
+<span class="material-symbols-outlined text-slate-400">chevron_right</span>
+</a>
+<a class="flex items-center gap-4 bg-white dark:bg-white/5 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-white/5 hover:border-primary/30 transition-all group" href="#">
+<div class="size-10 flex items-center justify-center bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
+<span class="material-symbols-outlined text-primary">security</span>
+</div>
+<span class="flex-1 font-medium text-slate-700 dark:text-slate-200">Privacy &amp; Security</span>
+<span class="material-symbols-outlined text-slate-400">chevron_right</span>
+</a>
+<a class="flex items-center gap-4 bg-white dark:bg-white/5 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-white/5 hover:border-primary/30 transition-all group" href="#">
+<div class="size-10 flex items-center justify-center bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
+<span class="material-symbols-outlined text-primary">help</span>
+</div>
+<span class="flex-1 font-medium text-slate-700 dark:text-slate-200">Help &amp; Support</span>
+<span class="material-symbols-outlined text-slate-400">chevron_right</span>
+</a>
+</section>
+<!-- Logout Action -->
+<section class="mt-8 px-4">
+<button class="w-full flex items-center justify-center gap-2 py-4 px-6 rounded-xl bg-primary/10 border border-primary/20 text-primary font-bold hover:bg-primary/20 transition-all">
+<span class="material-symbols-outlined">logout</span>
+                Logout
+            </button>
+<p class="text-center mt-6 text-xs text-slate-400 dark:text-slate-500 uppercase tracking-widest">Serenity v2.4.0</p>
+</section>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-background-dark/95 backdrop-blur-xl border-t border-slate-200 dark:border-white/5 px-6 pb-6 pt-3 z-50">
+<div class="max-w-md mx-auto flex justify-between items-center">
+<a class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-semibold uppercase tracking-tighter">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">menu_book</span>
+<span class="text-[10px] font-semibold uppercase tracking-tighter">Journal</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-[10px] font-semibold uppercase tracking-tighter">Insights</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined active-icon">person</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter">Profile</span>
+<div class="h-1 w-1 bg-primary rounded-full"></div>
+</a>
+</div>
+</nav>
+</body></html>
+
+<!-- Journal Screen -->
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Serenity - Mood Journal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#36e236",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#112111",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "0.75rem", "xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .active-nav .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
+<!-- Header Section -->
+<header class="sticky top-0 z-20 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md px-6 pt-8 pb-4">
+<div class="flex items-center justify-between mb-6">
+<h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Mood Journal</h1>
+<button class="p-2 rounded-full hover:bg-primary/10 transition-colors text-slate-600 dark:text-slate-300">
+<span class="material-symbols-outlined text-2xl">tune</span>
+</button>
+</div>
+<!-- Search Bar -->
+<div class="relative group">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-slate-400 group-focus-within:text-primary transition-colors">search</span>
+</div>
+<input class="block w-full pl-11 pr-4 py-3 bg-white dark:bg-zinc-900 border-none rounded-lg shadow-sm focus:ring-2 focus:ring-primary/50 text-slate-700 dark:text-slate-200 placeholder-slate-400 text-sm transition-all" placeholder="Search your thoughts..." type="text"/>
+</div>
+</header>
+<!-- Journal Entries List -->
+<main class="flex-1 px-6 py-4 space-y-4">
+<!-- Today Section -->
+<div class="mb-2">
+<p class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-4">Today</p>
+<!-- Entry Card 1 -->
+<div class="bg-white dark:bg-zinc-900 p-5 rounded-lg shadow-sm border border-slate-100 dark:border-zinc-800 flex gap-4 items-start relative overflow-hidden">
+<div class="flex flex-col items-center justify-center min-w-[48px] h-12 bg-primary/10 rounded-lg text-primary">
+<span class="material-symbols-outlined">light_mode</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-semibold text-slate-900 dark:text-white">Morning Reflection</h3>
+<span class="text-xs text-slate-400">08:30 AM</span>
+</div>
+<p class="text-sm text-slate-600 dark:text-slate-400 line-clamp-2 leading-relaxed">
+                        I felt very energized after my walk today. The crisp air and the quiet neighborhood helped me clear my head before starting work...
+                    </p>
+<div class="mt-3 flex gap-2">
+<span class="px-2 py-1 bg-slate-100 dark:bg-zinc-800 rounded text-[10px] font-medium text-slate-500 uppercase tracking-wide">Energized</span>
+<span class="px-2 py-1 bg-slate-100 dark:bg-zinc-800 rounded text-[10px] font-medium text-slate-500 uppercase tracking-wide">Nature</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Yesterday Section -->
+<div class="pt-2">
+<p class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-4">Yesterday • Oct 23</p>
+<div class="space-y-4">
+<!-- Entry Card 2 -->
+<div class="bg-white dark:bg-zinc-900 p-5 rounded-lg shadow-sm border border-slate-100 dark:border-zinc-800 flex gap-4 items-start">
+<div class="flex flex-col items-center justify-center min-w-[48px] h-12 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg text-indigo-500">
+<span class="material-symbols-outlined">dark_mode</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-semibold text-slate-900 dark:text-white">Late Night Thoughts</h3>
+<span class="text-xs text-slate-400">11:15 PM</span>
+</div>
+<p class="text-sm text-slate-600 dark:text-slate-400 line-clamp-2 leading-relaxed">
+                            Reflecting on the meeting earlier, I feel proud of how I handled the feedback. It was tough but constructive...
+                        </p>
+</div>
+</div>
+<!-- Entry Card 3 -->
+<div class="bg-white dark:bg-zinc-900 p-5 rounded-lg shadow-sm border border-slate-100 dark:border-zinc-800 flex gap-4 items-start">
+<div class="flex flex-col items-center justify-center min-w-[48px] h-12 bg-amber-100 dark:bg-amber-900/30 rounded-lg text-amber-500">
+<span class="material-symbols-outlined">sentiment_satisfied</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-semibold text-slate-900 dark:text-white">Coffee Shop Calm</h3>
+<span class="text-xs text-slate-400">02:45 PM</span>
+</div>
+<p class="text-sm text-slate-600 dark:text-slate-400 line-clamp-2 leading-relaxed">
+                            Finally finished the book I've been reading for months. The ending was unexpected but very satisfying...
+                        </p>
+</div>
+</div>
+</div>
+</div>
+<!-- Older Section -->
+<div class="pt-2 pb-24">
+<p class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-4">Oct 22</p>
+<div class="bg-white dark:bg-zinc-900 p-5 rounded-lg shadow-sm border border-slate-100 dark:border-zinc-800 flex gap-4 items-start">
+<div class="flex flex-col items-center justify-center min-w-[48px] h-12 bg-rose-100 dark:bg-rose-900/30 rounded-lg text-rose-500">
+<span class="material-symbols-outlined">cloudy_filled</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-semibold text-slate-900 dark:text-white">Rainy Afternoon</h3>
+<span class="text-xs text-slate-400">04:20 PM</span>
+</div>
+<p class="text-sm text-slate-600 dark:text-slate-400 line-clamp-2 leading-relaxed">
+                        Feeling a bit sluggish today. The rain is nice but it's making me want to just stay in bed and watch movies...
+                    </p>
+</div>
+</div>
+</div>
+</main>
+<!-- Floating Action Button -->
+<button class="fixed right-6 bottom-24 size-14 bg-primary text-white rounded-full shadow-lg shadow-primary/40 flex items-center justify-center active:scale-95 transition-transform z-30">
+<span class="material-symbols-outlined text-3xl">add</span>
+</button>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 inset-x-0 bg-white/90 dark:bg-zinc-950/90 backdrop-blur-xl border-t border-slate-100 dark:border-zinc-800 px-6 py-3 pb-8 z-40">
+<div class="flex justify-between items-center max-w-md mx-auto">
+<a class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-medium">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary active-nav" href="#">
+<span class="material-symbols-outlined">book</span>
+<span class="text-[10px] font-bold">Journal</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">monitoring</span>
+<span class="text-[10px] font-medium">Insights</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-medium">Profile</span>
+</a>
+</div>
+</nav>
+</body></html>
+
+<!-- Insights Screen -->
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Serenity - Insights</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#36e236",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#112111",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .chart-gradient {
+            fill: url(#chartFill);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
+<!-- Header Section -->
+<header class="sticky top-0 z-10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md px-4 pt-6 pb-2">
+<div class="flex items-center justify-between mb-4">
+<button class="p-2 hover:bg-primary/10 rounded-full transition-colors">
+<span class="material-symbols-outlined text-slate-700 dark:text-slate-300">arrow_back</span>
+</button>
+<h1 class="text-xl font-bold tracking-tight">Insights</h1>
+<button class="p-2 hover:bg-primary/10 rounded-full transition-colors">
+<span class="material-symbols-outlined text-slate-700 dark:text-slate-300">calendar_month</span>
+</button>
+</div>
+<!-- Weekly/Monthly Toggle -->
+<div class="flex p-1 bg-primary/10 dark:bg-primary/5 rounded-xl mb-4">
+<button class="flex-1 py-2 text-sm font-semibold rounded-lg bg-white dark:bg-background-dark shadow-sm text-slate-900 dark:text-white">
+                Weekly
+            </button>
+<button class="flex-1 py-2 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-700">
+                Monthly
+            </button>
+</div>
+</header>
+<main class="flex-1 px-4 pb-24 space-y-6 overflow-y-auto">
+<!-- Mood Fluctuations Chart Card -->
+<section class="bg-white dark:bg-slate-900/50 rounded-xl p-5 shadow-sm border border-primary/5">
+<div class="flex justify-between items-end mb-6">
+<div>
+<h2 class="text-sm font-medium text-slate-500 dark:text-slate-400">Mood Fluctuations</h2>
+<p class="text-2xl font-bold text-slate-900 dark:text-white">Steady &amp; Positive</p>
+</div>
+<div class="flex items-center gap-1 bg-primary/20 text-green-700 dark:text-primary px-2 py-1 rounded-full text-xs font-bold">
+<span class="material-symbols-outlined text-xs">trending_up</span>
+                    12%
+                </div>
+</div>
+<!-- Chart Visualization -->
+<div class="relative h-48 w-full">
+<svg class="w-full h-full overflow-visible" viewbox="0 0 400 150">
+<defs>
+<lineargradient id="chartFill" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#36e236" stop-opacity="0.3"></stop>
+<stop offset="100%" stop-color="#36e236" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+<!-- Area Fill -->
+<path class="chart-gradient" d="M0,120 Q40,110 80,40 T160,60 T240,100 T320,30 T400,50 V150 H0 Z"></path>
+<!-- Line Path -->
+<path d="M0,120 Q40,110 80,40 T160,60 T240,100 T320,30 T400,50" fill="none" stroke="#36e236" stroke-linecap="round" stroke-width="3"></path>
+<!-- Points -->
+<circle class="animate-pulse" cx="80" cy="40" fill="#36e236" r="4"></circle>
+<circle cx="320" cy="30" fill="#36e236" r="4"></circle>
+</svg>
+<div class="flex justify-between mt-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+<span>Mon</span>
+<span>Tue</span>
+<span>Wed</span>
+<span>Thu</span>
+<span>Fri</span>
+<span>Sat</span>
+<span>Sun</span>
+</div>
+</div>
+</section>
+<!-- Top Moods Grid -->
+<section>
+<h3 class="text-lg font-bold mb-4 px-1">Top Moods</h3>
+<div class="grid grid-cols-3 gap-3">
+<!-- Calm -->
+<div class="bg-white dark:bg-slate-900/50 p-4 rounded-xl flex flex-col items-center shadow-sm border border-primary/5">
+<div class="relative flex items-center justify-center mb-3">
+<svg class="w-16 h-16 transform -rotate-90">
+<circle class="text-primary/10" cx="32" cy="32" fill="transparent" r="28" stroke="currentColor" stroke-width="4"></circle>
+<circle class="text-primary" cx="32" cy="32" fill="transparent" r="28" stroke="currentColor" stroke-dasharray="176" stroke-dashoffset="35" stroke-width="4"></circle>
+</svg>
+<span class="material-symbols-outlined absolute text-primary">eco</span>
+</div>
+<span class="text-xs font-bold text-slate-800 dark:text-slate-200">Calm</span>
+<span class="text-[10px] text-slate-400 font-medium">80%</span>
+</div>
+<!-- Happy -->
+<div class="bg-white dark:bg-slate-900/50 p-4 rounded-xl flex flex-col items-center shadow-sm border border-primary/5">
+<div class="relative flex items-center justify-center mb-3">
+<svg class="w-16 h-16 transform -rotate-90">
+<circle class="text-primary/10" cx="32" cy="32" fill="transparent" r="28" stroke="currentColor" stroke-width="4"></circle>
+<circle class="text-primary" cx="32" cy="32" fill="transparent" r="28" stroke="currentColor" stroke-dasharray="176" stroke-dashoffset="61" stroke-width="4"></circle>
+</svg>
+<span class="material-symbols-outlined absolute text-primary">sentiment_satisfied</span>
+</div>
+<span class="text-xs font-bold text-slate-800 dark:text-slate-200">Happy</span>
+<span class="text-[10px] text-slate-400 font-medium">65%</span>
+</div>
+<!-- Focused -->
+<div class="bg-white dark:bg-slate-900/50 p-4 rounded-xl flex flex-col items-center shadow-sm border border-primary/5">
+<div class="relative flex items-center justify-center mb-3">
+<svg class="w-16 h-16 transform -rotate-90">
+<circle class="text-primary/10" cx="32" cy="32" fill="transparent" r="28" stroke="currentColor" stroke-width="4"></circle>
+<circle class="text-primary" cx="32" cy="32" fill="transparent" r="28" stroke="currentColor" stroke-dasharray="176" stroke-dashoffset="88" stroke-width="4"></circle>
+</svg>
+<span class="material-symbols-outlined absolute text-primary">target</span>
+</div>
+<span class="text-xs font-bold text-slate-800 dark:text-slate-200">Focused</span>
+<span class="text-[10px] text-slate-400 font-medium">50%</span>
+</div>
+</div>
+</section>
+<!-- AI Insights Summary Card -->
+<section class="bg-primary/10 dark:bg-primary/5 border border-primary/20 rounded-xl p-5 relative overflow-hidden">
+<div class="absolute -right-4 -top-4 opacity-10">
+<span class="material-symbols-outlined text-8xl text-primary">auto_awesome</span>
+</div>
+<div class="flex items-center gap-2 mb-3">
+<span class="material-symbols-outlined text-primary fill-1">auto_awesome</span>
+<h3 class="font-bold text-slate-900 dark:text-primary">AI Insight</h3>
+</div>
+<p class="text-sm leading-relaxed text-slate-700 dark:text-slate-300">
+                You feel most calm in the <span class="font-bold text-slate-900 dark:text-white">mornings</span>. Consider keeping up your reflection routine to maintain this balance throughout the day.
+            </p>
+</section>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 w-full bg-white/90 dark:bg-background-dark/90 backdrop-blur-lg border-t border-primary/10 px-6 py-3 flex items-center justify-between z-20">
+<a class="flex flex-col items-center gap-1 group" href="#">
+<span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">home</span>
+<span class="text-[10px] font-medium text-slate-400 group-hover:text-primary transition-colors">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 group" href="#">
+<span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">menu_book</span>
+<span class="text-[10px] font-medium text-slate-400 group-hover:text-primary transition-colors">Journal</span>
+</a>
+<a class="flex flex-col items-center gap-1 relative" href="#">
+<div class="absolute -top-1 w-1 h-1 bg-primary rounded-full"></div>
+<span class="material-symbols-outlined text-primary fill-1">analytics</span>
+<span class="text-[10px] font-bold text-primary">Insights</span>
+</a>
+<a class="flex flex-col items-center gap-1 group" href="#">
+<span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">person</span>
+<span class="text-[10px] font-medium text-slate-400 group-hover:text-primary transition-colors">Profile</span>
+</a>
+</nav>
+</body></html>
+
+<!-- New Journal Entry -->
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Serenity - New Entry</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#36e236",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#112111",
+                        "lavender": "#e6e6fa",
+                        "sage-soft": "#d1e6d1",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-[#0e1b0e] dark:text-white min-h-screen flex justify-center">
+<div class="relative flex h-full min-h-screen w-full max-w-md flex-col bg-background-light dark:bg-background-dark overflow-x-hidden shadow-2xl">
+<!-- Header -->
+<header class="flex items-center justify-between px-6 py-4 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md sticky top-0 z-50">
+<button class="text-[#5c705c] dark:text-sage-soft font-medium text-base hover:opacity-70 transition-opacity">Cancel</button>
+<h1 class="text-[#0e1b0e] dark:text-white text-lg font-semibold tracking-tight">New Entry</h1>
+<button class="bg-primary text-white px-5 py-2 rounded-full font-bold text-sm shadow-sm hover:brightness-105 active:scale-95 transition-all">Save</button>
+</header>
+<main class="flex-1 px-6 pt-4 pb-24">
+<!-- Mood Section -->
+<section class="mb-8">
+<h2 class="text-[#0e1b0e] dark:text-white text-lg font-bold mb-4">How are you feeling?</h2>
+<div class="flex justify-between items-center bg-white dark:bg-[#1a2e1a] p-4 rounded-xl shadow-sm border border-sage-soft dark:border-primary/10">
+<div class="flex flex-col items-center gap-2 group cursor-pointer">
+<div class="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">😌</div>
+<span class="text-xs font-medium text-[#5c705c] dark:text-sage-soft">Calm</span>
+</div>
+<div class="flex flex-col items-center gap-2 group cursor-pointer">
+<div class="w-12 h-12 rounded-full bg-yellow-50 dark:bg-yellow-900/20 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform ring-2 ring-primary">😊</div>
+<span class="text-xs font-bold text-primary">Happy</span>
+</div>
+<div class="flex flex-col items-center gap-2 group cursor-pointer">
+<div class="w-12 h-12 rounded-full bg-gray-50 dark:bg-gray-800 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">😐</div>
+<span class="text-xs font-medium text-[#5c705c] dark:text-sage-soft">Neutral</span>
+</div>
+<div class="flex flex-col items-center gap-2 group cursor-pointer">
+<div class="w-12 h-12 rounded-full bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">😔</div>
+<span class="text-xs font-medium text-[#5c705c] dark:text-sage-soft">Sad</span>
+</div>
+<div class="flex flex-col items-center gap-2 group cursor-pointer">
+<div class="w-12 h-12 rounded-full bg-orange-50 dark:bg-orange-900/20 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">😰</div>
+<span class="text-xs font-medium text-[#5c705c] dark:text-sage-soft">Anxious</span>
+</div>
+</div>
+</section>
+<!-- Reflections Section -->
+<section class="mb-8 flex-1 flex flex-col">
+<div class="flex justify-between items-end mb-2">
+<h2 class="text-[#0e1b0e] dark:text-white text-lg font-bold">Reflections</h2>
+<span class="text-[10px] text-[#5c705c] dark:text-sage-soft uppercase tracking-widest font-bold">May 24, 2024</span>
+</div>
+<textarea class="w-full min-h-[280px] bg-transparent border-none focus:ring-0 text-[#0e1b0e] dark:text-white text-lg leading-relaxed placeholder:text-sage-soft/60 resize-none p-0" placeholder="What's on your mind?"></textarea>
+</section>
+<!-- Tags Section -->
+<section class="mb-12">
+<div class="flex items-center justify-between mb-4">
+<h2 class="text-[#0e1b0e] dark:text-white text-lg font-bold">Add Tags</h2>
+<span class="material-symbols-outlined text-[#5c705c] dark:text-sage-soft text-xl cursor-pointer hover:text-primary transition-colors">add_circle</span>
+</div>
+<div class="flex flex-wrap gap-2">
+<button class="px-4 py-1.5 rounded-full bg-primary text-white text-sm font-medium border border-primary transition-all">Work</button>
+<button class="px-4 py-1.5 rounded-full bg-white dark:bg-[#1a2e1a] text-[#5c705c] dark:text-sage-soft text-sm font-medium border border-sage-soft dark:border-primary/20 hover:border-primary transition-all">Family</button>
+<button class="px-4 py-1.5 rounded-full bg-white dark:bg-[#1a2e1a] text-[#5c705c] dark:text-sage-soft text-sm font-medium border border-sage-soft dark:border-primary/20 hover:border-primary transition-all">Nature</button>
+<button class="px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-bold border border-primary/30 transition-all">Sleep</button>
+<button class="px-4 py-1.5 rounded-full bg-white dark:bg-[#1a2e1a] text-[#5c705c] dark:text-sage-soft text-sm font-medium border border-sage-soft dark:border-primary/20 hover:border-primary transition-all">Exercise</button>
+<button class="px-4 py-1.5 rounded-full bg-white dark:bg-[#1a2e1a] text-[#5c705c] dark:text-sage-soft text-sm font-medium border border-sage-soft dark:border-primary/20 hover:border-primary transition-all">Social</button>
+</div>
+</section>
+</main>
+<!-- Media Bar (Floating above keyboard area) -->
+<footer class="fixed bottom-0 left-0 right-0 max-w-md mx-auto px-6 py-4 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm border-t border-sage-soft/30 dark:border-primary/5">
+<div class="flex items-center gap-6 text-[#5c705c] dark:text-sage-soft">
+<button class="flex items-center gap-2 hover:text-primary transition-colors group">
+<span class="material-symbols-outlined text-2xl group-active:scale-90 transition-transform">image</span>
+<span class="text-xs font-semibold">Photo</span>
+</button>
+<div class="w-px h-6 bg-sage-soft/50 dark:bg-primary/10"></div>
+<button class="flex items-center gap-2 hover:text-primary transition-colors group">
+<span class="material-symbols-outlined text-2xl group-active:scale-90 transition-transform">mic</span>
+<span class="text-xs font-semibold">Voice Note</span>
+</button>
+<div class="flex-1"></div>
+<span class="text-[10px] font-bold text-sage-soft tracking-wider uppercase">Draft Saved</span>
+</div>
+</footer>
+</div>
+</body></html>
+
+<!-- AI Interaction Screen -->
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Serenity AI - Wellness Interaction</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#36e236",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#112111",
+                        "sage-glass": "rgba(232, 243, 232, 0.7)",
+                        "white-glass": "rgba(255, 255, 255, 0.5)",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-blur {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .bg-animated {
+            background: linear-gradient(135deg, #f0fdf4 0%, #f5f3ff 50%, #f0fdf4 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            z-index: 0;
+            opacity: 0.4;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-display bg-background-light dark:bg-background-dark text-[#0e1b0e] overflow-hidden">
+<!-- Ambient Background Orbs -->
+<div class="fixed inset-0 bg-animated -z-10">
+<div class="orb w-[400px] h-[400px] bg-primary/20 top-[-10%] left-[-10%]"></div>
+<div class="orb w-[350px] h-[350px] bg-purple-200/40 bottom-[10%] right-[-5%]"></div>
+<div class="orb w-[300px] h-[300px] bg-teal-100/50 top-[40%] left-[20%]"></div>
+</div>
+<div class="relative flex flex-col h-screen w-full max-w-2xl mx-auto border-x border-primary/5 shadow-2xl bg-white/10 backdrop-blur-sm">
+<!-- Header -->
+<header class="flex items-center justify-between px-6 py-8 z-10">
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-white/40 glass-blur text-[#0e1b0e] transition-all hover:bg-white/60">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<div class="flex flex-col items-center gap-2">
+<!-- Breathing Avatar -->
+<div class="relative flex items-center justify-center">
+<div class="absolute w-12 h-12 bg-primary/20 rounded-xl animate-pulse"></div>
+<div class="relative w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/30">
+<span class="material-symbols-outlined text-white text-xl">spa</span>
+</div>
+</div>
+<div class="flex items-center gap-2 mt-1">
+<div class="w-2 h-2 rounded-full bg-primary animate-ping"></div>
+<span class="text-sm font-medium tracking-wide text-[#0e1b0e]/80">Serenity AI is listening...</span>
+</div>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-white/40 glass-blur text-[#0e1b0e] transition-all hover:bg-white/60">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</header>
+<!-- Chat Area -->
+<main class="flex-1 overflow-y-auto px-6 space-y-8 py-4 scroll-smooth">
+<!-- AI Message -->
+<div class="flex items-end gap-3 max-w-[85%]">
+<div class="flex flex-col gap-1 items-start">
+<p class="text-xs font-semibold uppercase tracking-widest text-primary ml-4 mb-1">Serenity</p>
+<div class="bg-sage-glass glass-blur rounded-xl rounded-bl-none px-6 py-4 shadow-sm border border-white/40">
+<p class="text-base leading-relaxed text-[#0e1b0e]/90 font-medium">
+                            I'm here for you. Take a deep breath. How are you feeling in this moment?
+                        </p>
+</div>
+</div>
+</div>
+<!-- User Message -->
+<div class="flex items-end gap-3 justify-end ml-auto max-w-[85%]">
+<div class="flex flex-col gap-1 items-end">
+<p class="text-xs font-semibold uppercase tracking-widest text-gray-400 mr-4 mb-1">You</p>
+<div class="bg-white-glass glass-blur rounded-xl rounded-br-none px-6 py-4 shadow-sm border border-white/60">
+<p class="text-base leading-relaxed text-[#1a1a1a]">
+                            I've been feeling a bit overwhelmed with work lately. Everything feels like it's piling up.
+                        </p>
+</div>
+</div>
+</div>
+<!-- AI Message -->
+<div class="flex items-end gap-3 max-w-[85%]">
+<div class="flex flex-col gap-1 items-start">
+<p class="text-xs font-semibold uppercase tracking-widest text-primary ml-4 mb-1">Serenity</p>
+<div class="bg-sage-glass glass-blur rounded-xl rounded-bl-none px-6 py-4 shadow-sm border border-white/40">
+<p class="text-base leading-relaxed text-[#0e1b0e]/90 font-medium">
+                            It's completely understandable to feel that way. You're carrying a lot. Would you like to try a quick grounding exercise or just vent about it?
+                        </p>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer / Input -->
+<footer class="p-6 pb-10 space-y-6 z-10">
+<!-- Quick Reply Chips -->
+<div class="flex gap-3 overflow-x-auto no-scrollbar pb-2">
+<button class="flex-none h-10 px-5 flex items-center justify-center rounded-full bg-white/60 glass-blur border border-white/80 text-sm font-medium text-[#0e1b0e] hover:bg-primary/10 hover:border-primary/30 transition-all whitespace-nowrap shadow-sm">
+                    I’m feeling anxious
+                </button>
+<button class="flex-none h-10 px-5 flex items-center justify-center rounded-full bg-white/60 glass-blur border border-white/80 text-sm font-medium text-[#0e1b0e] hover:bg-primary/10 hover:border-primary/30 transition-all whitespace-nowrap shadow-sm">
+                    I need to vent
+                </button>
+<button class="flex-none h-10 px-5 flex items-center justify-center rounded-full bg-white/60 glass-blur border border-white/80 text-sm font-medium text-[#0e1b0e] hover:bg-primary/10 hover:border-primary/30 transition-all whitespace-nowrap shadow-sm">
+                    Tell me a breathing exercise
+                </button>
+</div>
+<!-- Input Bar -->
+<div class="flex items-center gap-3 bg-white/80 glass-blur p-2 pr-3 rounded-full border border-white shadow-xl shadow-black/5">
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-gray-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">add</span>
+</button>
+<input class="flex-1 bg-transparent border-none focus:ring-0 text-base placeholder-gray-400 py-3" placeholder="Tell me what's on your mind..." type="text"/>
+<div class="flex items-center gap-1">
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-primary hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined">mic</span>
+</button>
+<button class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/30 hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[20px]">send</span>
+</button>
+</div>
+</div>
+</footer>
+</div>
+<!-- Background Images (Hidden but defined for rules) -->
+<div class="hidden">
+<img data-alt="Soft ethereal light orbs in pastel colors background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBBjqy4D7Yzhyxtm33ZCjRwasUs_TVIDNLVExxN1VQhUlx3zq78V3rz5M5qR9MIKJxwVukmkutjInGQ1RKxt-2dKay0nBx6uN5WtCJW0QB3eImePIFiB_hNbjdWd2MgnF4zO64Q78F_HPUvrPYB45MuTyTX5mrwvtWtD7fual9-g8R1jPXBArM2XHJ8UeLTve3s1di966YaMwUPUVNG1di-1dAW5b9z3a5vFSZKdrVSVYGLz3K44jQIXoZ5Jn_gK8fQE2wkJgBQzWn4"/>
+<img data-alt="Abstract geometric avatar icon for AI" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCOoTkFjZhlXBLaPjdCsTakbGY96iLFPbly7Z0bRxQN_r5fruDhSnqOQWTRgMOB7U53-Efl9jezKBOqSdtzvVAy7fhN2dooFKYmKpkdGaWQZQm3iN_VhRm1b_myoEM2a5woOoCXe7pNedvomZqgxAgrn_rPJur1N0aLkib_2VoOv8F718x6iPi2yeMGePz0Tt1BMXyBZUcNiUdpiOpCv0VRhrDrV3mFucdD_K8zJX5dsR3SMvT4co4-ZqZJJuIxdZTgesqkXugnMGrd"/>
+</div>
+<style>
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        /* Hide scrollbar for IE, Edge and Firefox */
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+    </style>
+</body></html>
