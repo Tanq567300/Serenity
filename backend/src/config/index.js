@@ -5,7 +5,7 @@ const config = {
     mongoUri: process.env.MONGO_URI || 'mongodb://localhost:27017/mental_wellness',
     jwtSecret: process.env.JWT_SECRET,
     encryptionSecret: process.env.ENCRYPTION_SECRET,
-    openaiApiKey: process.env.OPENAI_API_KEY,
+    geminiApiKey: process.env.GEMINI_API_KEY,
     env: process.env.NODE_ENV || 'development',
 };
 
