@@ -1,11 +1,12 @@
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+const axios = require('axios');
 
-// Initialize Gemini client
-// Ensure GEMINI_API_KEY is in .env
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+// Initialize Gemini configuration
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const MODEL_NAME = 'gemini-2.0-flash';
+const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${GEMINI_API_KEY}`;
 
 /**
- * Generates a chat response using Gemini
+ * Generates a chat response using Gemini via Axios (REST API)
  * @param {object} params
  * @param {string} params.userId - User ID
  * @param {string} params.message - Current user message
@@ -13,9 +14,11 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
  * @returns {Promise<string>} - The assistant's response
  */
 const generateChatResponse = async ({ userId, message, sessionContext = [] }) => {
-    try {
-        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    if (!GEMINI_API_KEY) {
+        throw new Error('GEMINI_API_KEY is missing');
+    }
 
+    try {
         const systemPrompt = `
 You are Serenity, a compassionate and supportive mental wellness AI companion.
 Your goal is to provide a safe space for users to express their feelings.
@@ -30,49 +33,45 @@ Guidelines:
 - Validating the user's feelings is your first priority.
     `.trim();
 
-        // Construct history for Gemini
-        // Gemini uses 'user' and 'model' roles.
-        const history = sessionContext.map(msg => ({
+        // Construct contents for Gemini
+        const contents = sessionContext.map(msg => ({
             role: msg.role === 'assistant' ? 'model' : 'user',
             parts: [{ text: msg.content }]
         }));
 
-        // Prepend system prompt to history (Gemini Pro doesn't have system instruction in same way as GPT yet via standard SDK for all versions, 
-        // but we can prepend it to the first message or send it as part of the chat start).
-        // Better strategy for consistency:
-        // Start chat with history, but we need to ensure the system prompt is effective.
-        // We can add the system prompt as the first "user" message, and a dummy "model" acknowledgement if we want strict history.
-        // Or just prepend it to the current message if history is empty. 
-        // Let's prepend to the very first message in the history if it exists, or the active message.
-
-        // Actually, gemini-1.5-pro supports systemInstruction. Let's assume standard gemini-pro for now which might not.
-        // Safest approach: Prepend to the context.
-
-        const chat = model.startChat({
-            history: [
-                {
-                    role: "user",
-                    parts: [{ text: `SYSTEM INSTRUCTION: ${systemPrompt}` }],
-                },
-                {
-                    role: "model",
-                    parts: [{ text: "Understood. I am Serenity, ready to support you." }],
-                },
-                ...history
-            ],
-            generationConfig: {
-                maxOutputTokens: 300,
-            },
+        // Add current user message
+        contents.push({
+            role: 'user',
+            parts: [{ text: message }]
         });
 
-        const result = await chat.sendMessage(message);
-        const response = await result.response;
-        const text = response.text();
+        const payload = {
+            contents: contents,
+            systemInstruction: {
+                parts: [{ text: systemPrompt }]
+            },
+            generationConfig: {
+                maxOutputTokens: 300,
+                temperature: 0.7
+            }
+        };
 
-        return text;
+        const response = await axios.post(API_URL, payload);
+
+        if (response.data && response.data.candidates && response.data.candidates.length > 0) {
+            const candidate = response.data.candidates[0];
+            if (candidate.content && candidate.content.parts && candidate.content.parts.length > 0) {
+                return candidate.content.parts[0].text;
+            }
+        }
+
+        throw new Error('No valid response from Gemini');
 
     } catch (error) {
-        console.error('AI Service Error:', error);
+        console.error('AI Service Error:', error.response?.data || error.message);
+        if (error.response?.status === 429) {
+            return "I'm currently receiving too many requests. Please try again in a moment."; // Graceful fallback
+        }
         throw new Error('Failed to generate AI response');
     }
 };
