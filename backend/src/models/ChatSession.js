@@ -1,28 +1,32 @@
 const mongoose = require('mongoose');
 
 const chatSessionSchema = new mongoose.Schema({
-    userId: {
+    user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true,
         index: true
     },
-    lastActive: {
+    startTime: {
         type: Date,
         default: Date.now
+    },
+    endTime: {
+        type: Date
+    },
+    isActive: {
+        type: Boolean,
+        default: true
+    },
+    summary: {
+        type: String, // Optional summary of the session
+        default: ''
     }
 }, {
-    timestamps: { createdAt: true, updatedAt: false } // Only createdAt, lastActive handles updates
+    timestamps: true
 });
 
-// Update lastActive on save
-chatSessionSchema.pre('save', function (next) {
-    if (this.isModified('lastActive')) {
-        // nothing special needed, just letting it save
-    }
-    next();
-});
+// Index for finding active sessions for a user
+chatSessionSchema.index({ user: 1, isActive: 1 });
 
-const ChatSession = mongoose.model('ChatSession', chatSessionSchema);
-
-module.exports = ChatSession;
+module.exports = mongoose.model('ChatSession', chatSessionSchema);

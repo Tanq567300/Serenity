@@ -1,15 +1,15 @@
 const mongoose = require('mongoose');
 
 const chatMessageSchema = new mongoose.Schema({
-    sessionId: {
+    session: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'ChatSession',
         required: true,
         index: true
     },
-    role: {
+    sender: {
         type: String,
-        enum: ['user', 'assistant'],
+        enum: ['user', 'assistant', 'system'],
         required: true
     },
     encryptedContent: {
@@ -17,22 +17,24 @@ const chatMessageSchema = new mongoose.Schema({
         required: true
     },
     inferredEmotion: {
-        type: String,
-        default: null
+        type: String, // e.g., 'neutral', 'anxious', 'sad', 'happy'
+        default: 'neutral'
     },
     moodScore: {
-        type: Number,
-        min: 1,
-        max: 5,
+        type: Number, // 1-10 or 1-5 scale
         default: null
+    },
+    isCrisis: {
+        type: Boolean,
+        default: false
     },
     timestamp: {
         type: Date,
         default: Date.now,
         index: true
     }
+}, {
+    timestamps: true
 });
 
-const ChatMessage = mongoose.model('ChatMessage', chatMessageSchema);
-
-module.exports = ChatMessage;
+module.exports = mongoose.model('ChatMessage', chatMessageSchema);

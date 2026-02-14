@@ -1,81 +1,51 @@
-const axios = require('axios');
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+const config = require('../config');
 
-// Initialize Gemini configuration
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const MODEL_NAME = 'gemini-2.0-flash';
-const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${GEMINI_API_KEY}`;
+// Initialize Gemini
+const genAI = new GoogleGenerativeAI(config.geminiApiKey);
 
-/**
- * Generates a chat response using Gemini via Axios (REST API)
- * @param {object} params
- * @param {string} params.userId - User ID
- * @param {string} params.message - Current user message
- * @param {Array} params.sessionContext - Array of previous messages [{role, content}]
- * @returns {Promise<string>} - The assistant's response
- */
-const generateChatResponse = async ({ userId, message, sessionContext = [] }) => {
-    if (!GEMINI_API_KEY) {
-        throw new Error('GEMINI_API_KEY is missing');
-    }
+// Use the user-requested model
+const MODEL_NAME = 'gemini-2.5-flash-lite';
 
+const SYSTEM_INSTRUCTION = `You are a supportive mental wellness assistant.
+You do not provide medical diagnosis.
+You provide empathetic listening and CBT-style reflection.
+If user expresses self-harm intent, encourage professional help.`;
+
+async function generateChatResponse({ message, sessionContext = [] }) {
     try {
-        const systemPrompt = `
-You are Serenity, a compassionate and supportive mental wellness AI companion.
-Your goal is to provide a safe space for users to express their feelings.
-You use principles of Cognitive Behavioral Therapy (CBT) to help users reflect, but you DO NOT diagnose or act as a doctor.
-If a user expresses serious distress or crisis, valid safety protocols (handled by another layer) should have caught it, but if you still detect it, urge them to seek professional help immediately.
+        const model = genAI.getGenerativeModel({ model: MODEL_NAME });
 
-Guidelines:
-- Be empathetic, non-judgmental, and patient.
-- Keep responses concise (under 150 words usually) unless a deeper explanation is asked for.
-- Ask open-ended questions to encourage reflection.
-- Do not use overly clinical language; be warm and human-like.
-- Validating the user's feelings is your first priority.
-    `.trim();
+        // Construct history from sessionContext
+        // sessionContext is expected to be an array of { role: 'user'|'model', parts: [{ text: '...' }] }
+        // or we convert our internal message format to Gemini format here.
+        // Internal: { sender: 'user'|'assistant', encryptedContent: '...' } (decrypted before passing here)
 
-        // Construct contents for Gemini
-        const contents = sessionContext.map(msg => ({
-            role: msg.role === 'assistant' ? 'model' : 'user',
-            parts: [{ text: msg.content }]
+        let history = sessionContext.map(msg => ({
+            role: msg.sender === 'user' ? 'user' : 'model',
+            parts: [{ text: msg.content }] // Assuming content is already decrypted
         }));
 
-        // Add current user message
-        contents.push({
-            role: 'user',
-            parts: [{ text: message }]
+        // Add system instruction as the first piece of context or use the systemInstruction property if supported by the model/SDK version.
+        // For current SDK, systemInstruction is supported in getGenerativeModel config.
+
+        const chat = model.startChat({
+            history: history,
+            systemInstruction: SYSTEM_INSTRUCTION,
         });
 
-        const payload = {
-            contents: contents,
-            systemInstruction: {
-                parts: [{ text: systemPrompt }]
-            },
-            generationConfig: {
-                maxOutputTokens: 300,
-                temperature: 0.7
-            }
-        };
+        const result = await chat.sendMessage(message);
+        const response = await result.response;
+        const text = response.text();
 
-        const response = await axios.post(API_URL, payload);
-
-        if (response.data && response.data.candidates && response.data.candidates.length > 0) {
-            const candidate = response.data.candidates[0];
-            if (candidate.content && candidate.content.parts && candidate.content.parts.length > 0) {
-                return candidate.content.parts[0].text;
-            }
-        }
-
-        throw new Error('No valid response from Gemini');
-
+        return text;
     } catch (error) {
-        console.error('AI Service Error:', error.response?.data || error.message);
-        if (error.response?.status === 429) {
-            return "I'm currently receiving too many requests. Please try again in a moment."; // Graceful fallback
-        }
+        console.error('Gemini API Error:', error);
         throw new Error('Failed to generate AI response');
     }
-};
+}
 
 module.exports = {
-    generateChatResponse
+    generateChatResponse,
+    genAI // Exporting instance if needed by other services
 };

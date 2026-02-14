@@ -1,62 +1,57 @@
 const crypto = require('crypto');
+const config = require('../config');
 
-// Ensure ENCRYPTION_SECRET is set in .env
 const ALGORITHM = 'aes-256-cbc';
-const SECRET_KEY = process.env.ENCRYPTION_SECRET; // Must be 32 bytes for AES-256
-const IV_LENGTH = 16; // AES block size
+const IV_LENGTH = 16; // For AES, this is always 16
 
-if (!SECRET_KEY) {
-    console.warn('WARNING: ENCRYPTION_SECRET is not defined. Encryption will fail.');
-}
-
-/**
- * Encrypts a text string
- * @param {string} text 
- * @returns {string} - format: iv:encryptedText (hex)
- */
-const encrypt = (text) => {
+function encrypt(text) {
     if (!text) return text;
-    if (!SECRET_KEY) throw new Error('Encryption secret missing');
+    if (!config.encryptionSecret) {
+        console.error('Encryption secret not found!');
+        throw new Error('Encryption secret is not configured.');
+    }
 
-    // If the secret is not 32 chars, we might want to hash it to fit, usually standard practice:
-    // but for now, assume the user provides a valid 32-char or similar key.
-    // Actually, let's hash the secret to ensure it's always 32 bytes (256 bits).
-    const key = crypto.createHash('sha256').update(String(SECRET_KEY)).digest('base64').substring(0, 32);
+    // Ensure the key is 32 bytes
+    // usage of scrypt to derive a 32 byte key from the string secret is better practice than raw slicing,
+    // but for this phase we will ensure the user provides a strong key or we hash it.
+    // For simplicity and to avoid async scrypt in sync path, we'll use a hash to get 32 bytes if length mismatch,
+    // or assume user provided 32 char string? 
+    // Let's use crypto.createHash to ensure consistent 32 byte key from any secret string.
+    const key = crypto.createHash('sha256').update(String(config.encryptionSecret)).digest();
 
     const iv = crypto.randomBytes(IV_LENGTH);
-    const cipher = crypto.createCipheriv(ALGORITHM, Buffer.from(key), iv);
+    const cipher = crypto.createCipheriv(ALGORITHM, key, iv);
 
     let encrypted = cipher.update(text);
     encrypted = Buffer.concat([encrypted, cipher.final()]);
 
+    // Return IV:EncryptedData
     return iv.toString('hex') + ':' + encrypted.toString('hex');
-};
+}
 
-/**
- * Decrypts an encrypted text string
- * @param {string} text - format: iv:encryptedText
- * @returns {string}
- */
-const decrypt = (text) => {
+function decrypt(text) {
     if (!text) return text;
-    if (!text.includes(':')) return text; // Not encrypted or legacy format
-    if (!SECRET_KEY) throw new Error('Encryption secret missing');
+    if (!config.encryptionSecret) {
+        throw new Error('Encryption secret is not configured.');
+    }
 
-    const key = crypto.createHash('sha256').update(String(SECRET_KEY)).digest('base64').substring(0, 32);
+    try {
+        const textParts = text.split(':');
+        const iv = Buffer.from(textParts.shift(), 'hex');
+        const encryptedText = Buffer.from(textParts.join(':'), 'hex');
 
-    const textParts = text.split(':');
-    const iv = Buffer.from(textParts.shift(), 'hex');
-    const encryptedText = Buffer.from(textParts.join(':'), 'hex');
+        const key = crypto.createHash('sha256').update(String(config.encryptionSecret)).digest();
+        const decipher = crypto.createDecipheriv(ALGORITHM, key, iv);
 
-    const decipher = crypto.createDecipheriv(ALGORITHM, Buffer.from(key), iv);
+        let decrypted = decipher.update(encryptedText);
+        decrypted = Buffer.concat([decrypted, decipher.final()]);
 
-    let decrypted = decipher.update(encryptedText);
-    decrypted = Buffer.concat([decrypted, decipher.final()]);
+        return decrypted.toString();
+    } catch (error) {
+        console.error('Decryption failed:', error);
+        // Fallback or throw? For now, return null or original to indicate failure, but throwing is safer for security.
+        throw new Error('Failed to decrypt message');
+    }
+}
 
-    return decrypted.toString();
-};
-
-module.exports = {
-    encrypt,
-    decrypt
-};
+module.exports = { encrypt, decrypt };
