@@ -38,7 +38,6 @@ const register = async (req, res, next) => {
             message: 'User registered successfully',
         });
     } catch (error) {
-        console.error('Register Error:', error);
         next(error);
     }
 };

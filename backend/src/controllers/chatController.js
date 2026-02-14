@@ -1,55 +1,50 @@
 const chatService = require('../services/chatService');
 
-// POST /api/chat/new-session
-const createSession = async (req, res) => {
+exports.startSession = async (req, res) => {
     try {
-        const userId = req.user.userId; // Assumes auth middleware populates req.user
-        const session = await chatService.createSession(userId);
+        const session = await chatService.createSession(req.user.userId);
         res.status(201).json({
+            success: true,
             sessionId: session._id,
-            message: 'New chat session created'
+            message: 'New chat session started'
         });
     } catch (error) {
-        console.error('Create Session Error:', error);
-        res.status(500).json({ error: 'Failed to create session' });
+        console.error('Start Session Error:', error);
+        res.status(500).json({ success: false, message: 'Failed to start session' });
     }
 };
 
-// POST /api/chat/message
-const sendMessage = async (req, res) => {
+exports.sendMessage = async (req, res) => {
     try {
-        const userId = req.user.userId;
         const { sessionId, message } = req.body;
 
         if (!sessionId || !message) {
-            return res.status(400).json({ error: 'sessionId and message are required' });
+            return res.status(400).json({ success: false, message: 'Session ID and message are required' });
         }
 
-        const result = await chatService.processUserMessage(userId, sessionId, message);
+        const result = await chatService.processUserMessage(req.user.userId, sessionId, message);
 
-        res.json(result);
+        res.json({
+            success: true,
+            data: result
+        });
     } catch (error) {
         console.error('Send Message Error:', error);
-        res.status(500).json({ error: 'Failed to process message' });
+        res.status(500).json({ success: false, message: 'Failed to process message' });
     }
 };
 
-// GET /api/chat/history/:sessionId
-const getHistory = async (req, res) => {
+exports.getHistory = async (req, res) => {
     try {
-        const userId = req.user.userId;
         const { sessionId } = req.params;
+        const history = await chatService.getSessionHistory(req.user.userId, sessionId);
 
-        const history = await chatService.getHistory(userId, sessionId);
-        res.json({ history });
+        res.json({
+            success: true,
+            data: history
+        });
     } catch (error) {
         console.error('Get History Error:', error);
-        res.status(500).json({ error: 'Failed to retrieve history' });
+        res.status(500).json({ success: false, message: 'Failed to retrieve history' });
     }
-};
-
-module.exports = {
-    createSession,
-    sendMessage,
-    getHistory
 };
