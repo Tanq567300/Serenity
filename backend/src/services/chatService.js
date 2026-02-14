@@ -1,140 +1,146 @@
-const mongoose = require('mongoose');
 const ChatSession = require('../models/ChatSession');
 const ChatMessage = require('../models/ChatMessage');
+const { encrypt, decrypt } = require('../utils/encryption');
 const crisisService = require('./crisisService');
 const emotionService = require('./emotionService');
 const aiService = require('./aiService');
-const encryption = require('../utils/encryption');
 
 /**
- * processUserMessage
- * Orchestrates the entire chat flow.
- * @param {string} userId - ID of the user
- * @param {string} sessionId - ID of the chat session
- * @param {string} messageContent - The raw text message from user
- * @returns {object} - The response object { response: string, crisis: boolean, ... }
+ * Process a user message in a chat session.
+ * @param {string} userId - The ID of the user.
+ * @param {string} sessionId - The ID of the session.
+ * @param {string} messageText - The user's message.
+ * @returns {Promise<Object>} - The AI response or crisis payload.
  */
-const processUserMessage = async (userId, sessionId, messageContent) => {
+async function processUserMessage(userId, sessionId, messageText) {
     // 1. Validate Session
-    const session = await ChatSession.findOne({ _id: sessionId, userId });
-    if (!session) {
-        throw new Error('Invalid session or unauthorized');
-    }
+    const session = await ChatSession.findOne({
+        _id: sessionId,
+        user: userId,
+        isActive: true
+    });
 
-    // Update session lastActive
-    session.lastActive = new Date();
-    await session.save();
+    if (!session) {
+        throw new Error('Invalid or inactive session');
+    }
 
     // 2. Crisis Detection
-    const crisisResult = crisisService.detectCrisis(messageContent);
-    if (crisisResult.isCrisis) {
-        // Return crisis response immediately, do not store as normal chat flow or call AI?
-        // Actually, we should probably store the user message for record, but maybe not the response from AI.
-        // Spec says: "Chat pipeline must bypass AI call. Return crisis support payload."
-        // Let's store the user message with a flag if possible, or just return. 
-        // For now, let's return immediately without storing to DB to keep it simple, 
-        // or store it but with a special flag. Let's just return the payload.
-        return {
-            response: crisisService.getCrisisResponse(),
-            isCrisis: true,
-            data: crisisResult
-        };
+    const crisisResult = crisisService.detectCrisis(messageText);
+
+    // Save User Message (Encrypted)
+    // We save it even if crisis, for audit/history, but maybe flag it?
+    // ChatMessage schema has isCrisis field.
+
+    // 3. Emotion Inference (Parallel with crisis check potentially, but sequential here for flow)
+    let emotionData = { emotion: 'neutral', moodScore: 3 };
+    if (!crisisResult.isCrisis) {
+        emotionData = await emotionService.inferEmotion(messageText);
     }
 
-    // 3. Emotion Inference
-    const emotionResult = await emotionService.inferEmotion(messageContent);
-
-    // 4. Fetch Context (Last 10-15 messages)
-    // Retrieve recent messages for this session
-    const recentMessages = await ChatMessage.find({ sessionId })
-        .sort({ timestamp: -1 })
-        .limit(10) // Limit to 10 for context window
-        .lean();
-
-    // Reverse to chronological order for AI
-    recentMessages.reverse();
-
-    // Decrypt content for AI context
-    const sessionContext = recentMessages.map(msg => ({
-        role: msg.role,
-        content: encryption.decrypt(msg.encryptedContent)
-    }));
-
-    // 5. & 6. Call AI Service
-    let aiResponseText;
-    try {
-        aiResponseText = await aiService.generateChatResponse({
-            userId,
-            message: messageContent,
-            sessionContext
-        });
-    } catch (error) {
-        console.error('AI Processing Error:', error);
-        // Fallback response?
-        aiResponseText = "I apologize, but I'm having trouble connecting right now. Please try again in a moment.";
-    }
-
-    // 7. Store Messages (Encrypted)
-
-    // User Message
     const userMessage = new ChatMessage({
-        sessionId,
-        role: 'user',
-        encryptedContent: encryption.encrypt(messageContent),
-        inferredEmotion: emotionResult.emotion,
-        moodScore: emotionResult.moodScore,
+        session: session._id,
+        sender: 'user',
+        encryptedContent: encrypt(messageText),
+        inferredEmotion: emotionData.emotion,
+        moodScore: emotionData.moodScore,
+        isCrisis: crisisResult.isCrisis,
         timestamp: new Date()
     });
     await userMessage.save();
 
-    // Assistant Message
-    const assistantMessage = new ChatMessage({
-        sessionId,
-        role: 'assistant',
-        encryptedContent: encryption.encrypt(aiResponseText),
-        // We could infer emotion from AI response too, but spec says "Store this metadata with user message"
+    // If Crisis, return immediately
+    if (crisisResult.isCrisis) {
+        // Return structured response but do NOT call Gemini
+        return {
+            reply: crisisResult.response.text,
+            resources: crisisResult.response.resources,
+            isCrisis: true
+        };
+    }
+
+    // 4. Fetch Context (Last 10 messages)
+    // Sort by timestamp descending, limit 10, then reverse to get chronological
+    const historyMessages = await ChatMessage.find({ session: session._id })
+        .sort({ timestamp: -1 })
+        .limit(10)
+        .lean();
+
+    // Organize context: chronological order
+    const context = historyMessages.reverse().map(msg => ({
+        sender: msg.sender,
+        content: decrypt(msg.encryptedContent),
+        // timestamp? emotion? aiService mainly needs content and role
+    }));
+
+    // 5. Generate AI Response
+    let aiResponseText;
+    try {
+        aiResponseText = await aiService.generateChatResponse({
+            message: messageText,
+            sessionContext: context
+        });
+    } catch (error) {
+        console.error('AI Generation Failed:', error);
+        // Fallback response? Or throw?
+        // Fallback is better for user experience
+        aiResponseText = "I apologize, I'm having trouble processing that right now. Could you try again?";
+    }
+
+    // 6. Save AI Response
+    const aiMessage = new ChatMessage({
+        session: session._id,
+        sender: 'assistant',
+        encryptedContent: encrypt(aiResponseText),
+        // AI emotion? Maybe infer from its own text? For now, use neutral or skip.
+        // We'll leave it default or null.
         timestamp: new Date()
     });
-    await assistantMessage.save();
+    await aiMessage.save();
 
-    // 8. Return Response
     return {
-        response: aiResponseText,
+        reply: aiResponseText,
         isCrisis: false,
-        emotion: emotionResult
+        emotion: emotionData
     };
-};
+}
 
 /**
- * createSession
- * Creates a new chat session for a user.
+ * Create a new chat session for a user.
  */
-const createSession = async (userId) => {
-    const session = new ChatSession({ userId });
+async function createSession(userId) {
+    // Optionally close previous active sessions?
+    // For now, allow multiple or just create new.
+    const session = new ChatSession({
+        user: userId,
+        isActive: true,
+        startTime: new Date()
+    });
     await session.save();
     return session;
-};
+}
 
 /**
- * getHistory
- * Retrieves decrypted history for a session.
+ * Get history for a session (Decrypted)
  */
-const getHistory = async (userId, sessionId) => {
-    const session = await ChatSession.findOne({ _id: sessionId, userId });
+async function getSessionHistory(userId, sessionId) {
+    const session = await ChatSession.findOne({ _id: sessionId, user: userId });
     if (!session) throw new Error('Session not found');
 
-    const messages = await ChatMessage.find({ sessionId }).sort({ timestamp: 1 }).lean();
+    const messages = await ChatMessage.find({ session: sessionId })
+        .sort({ timestamp: 1 })
+        .lean();
 
     return messages.map(msg => ({
-        role: msg.role,
-        content: encryption.decrypt(msg.encryptedContent),
+        id: msg._id,
+        sender: msg.sender,
+        content: decrypt(msg.encryptedContent),
         timestamp: msg.timestamp,
-        emotion: msg.inferredEmotion // Include metadata if needed
+        isCrisis: msg.isCrisis
     }));
-};
+}
 
 module.exports = {
     processUserMessage,
     createSession,
-    getHistory
+    getSessionHistory
 };
