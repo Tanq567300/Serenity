@@ -14,24 +14,22 @@ If user expresses self-harm intent, encourage professional help.`;
 
 async function generateChatResponse({ message, sessionContext = [] }) {
     try {
-        const model = genAI.getGenerativeModel({ model: MODEL_NAME });
+        // Pass system instruction here for correct API usage
+        const model = genAI.getGenerativeModel({
+            model: MODEL_NAME,
+            systemInstruction: SYSTEM_INSTRUCTION
+        });
 
         // Construct history from sessionContext
-        // sessionContext is expected to be an array of { role: 'user'|'model', parts: [{ text: '...' }] }
-        // or we convert our internal message format to Gemini format here.
-        // Internal: { sender: 'user'|'assistant', encryptedContent: '...' } (decrypted before passing here)
-
+        // ... (lines 24-27 unchanged) ...
         let history = sessionContext.map(msg => ({
             role: msg.sender === 'user' ? 'user' : 'model',
-            parts: [{ text: msg.content }] // Assuming content is already decrypted
+            parts: [{ text: msg.content }]
         }));
-
-        // Add system instruction as the first piece of context or use the systemInstruction property if supported by the model/SDK version.
-        // For current SDK, systemInstruction is supported in getGenerativeModel config.
 
         const chat = model.startChat({
             history: history,
-            systemInstruction: SYSTEM_INSTRUCTION,
+            // systemInstruction removed from here
         });
 
         const result = await chat.sendMessage(message);
@@ -40,8 +38,8 @@ async function generateChatResponse({ message, sessionContext = [] }) {
 
         return text;
     } catch (error) {
-        console.error('Gemini API Error:', error);
-        throw new Error('Failed to generate AI response');
+        console.error('Gemini API Error details:', JSON.stringify(error, null, 2));
+        throw new Error('Failed to generate AI response: ' + error.message);
     }
 }
 
