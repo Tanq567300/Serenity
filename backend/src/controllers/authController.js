@@ -86,6 +86,11 @@ const login = async (req, res, next) => {
             success: true,
             accessToken,
             refreshToken,
+            user: {
+                id: user._id,
+                email: user.email,
+                username: user.username // If username exists in schema
+            }
         });
     } catch (error) {
         next(error);
