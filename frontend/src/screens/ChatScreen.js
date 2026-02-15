@@ -1,41 +1,22 @@
-import React, { useEffect, useState, useRef, useContext } from 'react';
-import {
-    View,
-    FlatList,
-    StyleSheet,
-    KeyboardAvoidingView,
-    Platform,
-    SafeAreaView,
-    Text,
-    ActivityIndicator,
-    TextInput,
-    TouchableOpacity
-} from 'react-native';
-import { AuthContext } from '../context/AuthContext';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, FlatList, StyleSheet, KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import useChatStore from '../stores/chatStore';
 import ChatBubble from '../components/ChatBubble';
-import { colors, spacing, typography } from '../theme';
+import TypingIndicator from '../components/TypingIndicator';
 
-const ChatScreen = ({ navigation }) => {
-    const { logout, userInfo } = useContext(AuthContext);
+const ChatScreen = () => {
     const {
-        messages,
-        startSession,
-        sendMessage,
-        isLoading, // Initial loading
-        isTyping,  // AI typing state
-        error,
-        crisisMode,
-        reset
+        sessionId, messages, isTyping,
+        initializeSession, sendMessage
     } = useChatStore();
-
     const [inputText, setInputText] = useState('');
-    const flatListRef = useRef();
+    const flatListRef = useRef(null);
 
-    // Initialize session on mount
     useEffect(() => {
-        startSession();
-        return () => reset(); // Cleanup on unmount
+        if (!sessionId) {
+            initializeSession();
+        }
     }, []);
 
     const handleSend = async () => {
@@ -51,78 +32,45 @@ const ChatScreen = ({ navigation }) => {
             content={item.content}
             isCrisis={item.isCrisis}
             resources={item.resources}
-            timestamp={item.timestamp}
         />
     );
 
     return (
         <SafeAreaView style={styles.container}>
-            {/* Header */}
             <View style={styles.header}>
-                <View>
-                    <Text style={styles.headerTitle}>Serenity</Text>
-                    <Text style={styles.headerSubtitle}>Here for you, {userInfo?.username}</Text>
-                </View>
-                <TouchableOpacity onPress={logout} style={styles.logoutButton}>
-                    <Text style={styles.logoutText}>Logout</Text>
-                </TouchableOpacity>
+                <Text style={styles.headerTitle}>Serenity AI</Text>
+                <View style={styles.statusDot} />
             </View>
 
-            {/* Messages */}
-            {isLoading ? (
-                <View style={styles.centerContainer}>
-                    <ActivityIndicator size="large" color={colors.primary} />
-                    <Text style={styles.loadingText}>Starting calm session...</Text>
-                </View>
-            ) : (
-                <FlatList
-                    ref={flatListRef}
-                    data={messages}
-                    renderItem={renderItem}
-                    keyExtractor={item => item.id}
-                    contentContainerStyle={styles.listContent}
-                    onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
-                    onLayout={() => flatListRef.current?.scrollToEnd({ animated: true })}
-                />
-            )}
+            <FlatList
+                ref={flatListRef}
+                data={messages}
+                renderItem={renderItem}
+                keyExtractor={item => item.id}
+                contentContainerStyle={styles.listContent}
+                onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
+                ListFooterComponent={isTyping ? <TypingIndicator /> : null}
+            />
 
-            {/* Typing Indicator */}
-            {isTyping && (
-                <View style={styles.typingContainer}>
-                    <Text style={styles.typingText}>Serenity is typing...</Text>
-                </View>
-            )}
-
-            {/* Error Toast (Simple) */}
-            {error && (
-                <View style={styles.errorContainer}>
-                    <Text style={styles.errorText}>{error}</Text>
-                </View>
-            )}
-
-            {/* Input Area */}
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                keyboardVerticalOffset={Platform.OS === 'ios' ? 10 : 0}
-                style={styles.inputWrapper}
+                keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
             >
                 <View style={styles.inputContainer}>
                     <TextInput
                         style={styles.input}
-                        placeholder="Type your feelings..."
-                        placeholderTextColor={colors.textSecondary}
+                        placeholder="Type a message..."
+                        placeholderTextColor="#9ca3af"
                         value={inputText}
                         onChangeText={setInputText}
                         multiline
-                        maxLength={500}
-                        editable={!isLoading && !isTyping && !crisisMode} // Disable input during crisis logic if needed, typically we want to allow talking unless strictly blocked
                     />
                     <TouchableOpacity
-                        style={[styles.sendButton, (!inputText.trim() || isTyping) && styles.sendButtonDisabled]}
+                        style={[styles.sendButton, !inputText.trim() && styles.disabledSend]}
                         onPress={handleSend}
                         disabled={!inputText.trim() || isTyping}
                     >
-                        <Text style={styles.sendButtonText}>Send</Text>
+                        <Text style={styles.sendButtonText}>→</Text>
                     </TouchableOpacity>
                 </View>
             </KeyboardAvoidingView>
@@ -133,101 +81,68 @@ const ChatScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: colors.background,
+        backgroundColor: '#f6f8f6',
     },
     header: {
-        padding: spacing.m,
+        padding: 16,
         borderBottomWidth: 1,
-        borderBottomColor: colors.border,
-        backgroundColor: colors.surface,
+        borderBottomColor: 'rgba(0,0,0,0.05)',
         flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center'
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'rgba(255,255,255,0.8)',
     },
     headerTitle: {
-        ...typography.h2,
-        color: colors.primary,
+        fontSize: 18,
+        fontWeight: '600',
+        color: '#1a2e1a',
     },
-    headerSubtitle: {
-        ...typography.caption,
-    },
-    logoutButton: {
-        padding: spacing.s,
-    },
-    logoutText: {
-        color: colors.textSecondary,
-        fontWeight: '600'
-    },
-    centerContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    loadingText: {
-        marginTop: spacing.m,
-        color: colors.textSecondary,
+    statusDot: {
+        width: 8,
+        height: 8,
+        borderRadius: 4,
+        backgroundColor: '#36e236',
+        marginLeft: 8,
     },
     listContent: {
-        padding: spacing.m,
-        paddingBottom: spacing.xxl,
-    },
-    typingContainer: {
-        paddingHorizontal: spacing.l,
-        paddingVertical: spacing.s,
-    },
-    typingText: {
-        color: colors.textSecondary,
-        fontStyle: 'italic',
-        fontSize: 12
-    },
-    errorContainer: {
-        backgroundColor: colors.error,
-        padding: spacing.s,
-        alignItems: 'center',
-    },
-    errorText: {
-        color: '#FFF',
-        fontSize: 12
-    },
-    inputWrapper: {
-        borderTopWidth: 1,
-        borderTopColor: colors.border,
-        backgroundColor: colors.surface,
+        padding: 16,
+        paddingBottom: 20,
     },
     inputContainer: {
         flexDirection: 'row',
+        padding: 16,
+        backgroundColor: 'white',
+        borderTopWidth: 1,
+        borderTopColor: '#f1f5f9',
         alignItems: 'center',
-        padding: spacing.s,
-        paddingHorizontal: spacing.m,
-        marginVertical: spacing.s
     },
     input: {
         flex: 1,
-        backgroundColor: colors.background,
+        backgroundColor: '#f1f5f9',
         borderRadius: 20,
-        paddingHorizontal: spacing.m,
-        paddingVertical: spacing.s, // multiline height adjustment
-        minHeight: 40,
+        paddingHorizontal: 16,
+        paddingVertical: 10,
         maxHeight: 100,
         fontSize: 16,
-        color: colors.text,
+        color: '#1a2e1a',
     },
     sendButton: {
-        marginLeft: spacing.s,
-        backgroundColor: colors.primary,
-        paddingVertical: spacing.s,
-        paddingHorizontal: spacing.m,
-        borderRadius: 20,
+        marginLeft: 12,
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+        backgroundColor: '#36e236',
+        alignItems: 'center',
         justifyContent: 'center',
-        alignItems: 'center'
     },
-    sendButtonDisabled: {
-        backgroundColor: colors.border,
+    disabledSend: {
+        backgroundColor: '#e2e8f0',
     },
     sendButtonText: {
-        color: '#FFF',
-        fontWeight: '600'
-    }
+        color: 'white',
+        fontSize: 20,
+        fontWeight: 'bold',
+    },
 });
 
 export default ChatScreen;

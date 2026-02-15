@@ -1,64 +1,72 @@
-import React, { useState, useContext } from 'react';
-import { View, Text, StyleSheet, Alert, SafeAreaView } from 'react-native';
-import { AuthContext } from '../context/AuthContext';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Alert, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import useAuthStore from '../stores/authStore';
 import Button from '../components/Button';
 import Input from '../components/Input';
-import { colors, spacing, typography } from '../theme';
 
 const RegisterScreen = ({ navigation }) => {
-    const { register, isLoading } = useContext(AuthContext);
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const { register, isLoading, error } = useAuthStore();
 
     const handleRegister = async () => {
         if (!username || !email || !password) {
             Alert.alert('Error', 'Please fill in all fields');
             return;
         }
-        try {
-            await register(username, email, password);
-        } catch (error) {
-            const msg = error.response?.data?.message || 'Registration failed';
-            Alert.alert('Error', msg);
+
+        const success = await register(email, password, username);
+        if (success) {
+            Alert.alert('Success', 'Account created! Please login.', [
+                { text: 'OK', onPress: () => navigation.navigate('Login') }
+            ]);
+        } else {
+            Alert.alert('Registration Failed', error || 'Something went wrong');
         }
     };
 
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.content}>
-                <Text style={styles.title}>Create Account</Text>
-                <Text style={styles.subtitle}>Start your wellness journey today</Text>
+                <View style={styles.header}>
+                    <Text style={styles.title}>Create Account</Text>
+                    <Text style={styles.subtitle}>Join Serenity today.</Text>
+                </View>
 
-                <Input
-                    label="Username"
-                    placeholder="Choose a username"
-                    value={username}
-                    onChangeText={setUsername}
-                />
-                <Input
-                    label="Email"
-                    placeholder="Enter your email"
-                    value={email}
-                    onChangeText={setEmail}
-                />
-                <Input
-                    label="Password"
-                    placeholder="Choose a password"
-                    value={password}
-                    onChangeText={setPassword}
-                    secureTextEntry
-                />
+                <View style={styles.form}>
+                    <Input
+                        placeholder="Username"
+                        value={username}
+                        onChangeText={setUsername}
+                    />
+                    <Input
+                        placeholder="Email"
+                        value={email}
+                        onChangeText={setEmail}
+                        keyboardType="email-address"
+                    />
+                    <Input
+                        placeholder="Password"
+                        value={password}
+                        onChangeText={setPassword}
+                        secureTextEntry
+                    />
 
-                <View style={styles.spacer} />
+                    <Button
+                        title="Sign Up"
+                        onPress={handleRegister}
+                        loading={isLoading}
+                    />
 
-                <Button title="Sign Up" onPress={handleRegister} loading={isLoading} />
-                <Button
-                    title="Already have an account? Login"
-                    variant="outline"
-                    onPress={() => navigation.navigate('Login')}
-                    disabled={isLoading}
-                />
+                    <View style={styles.footer}>
+                        <Text style={styles.footerText}>Already have an account? </Text>
+                        <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+                            <Text style={styles.link}>Login</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
             </View>
         </SafeAreaView>
     );
@@ -67,27 +75,46 @@ const RegisterScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: colors.background,
+        backgroundColor: '#f6f8f6',
+        justifyContent: 'center',
     },
     content: {
-        flex: 1,
-        justifyContent: 'center',
-        padding: spacing.l,
+        padding: 24,
+    },
+    header: {
+        alignItems: 'center',
+        marginBottom: 30,
     },
     title: {
-        ...typography.h1,
-        marginBottom: spacing.xs,
-        textAlign: 'center',
+        fontSize: 28,
+        fontWeight: '600',
+        color: '#1a2e1a',
+        marginBottom: 4,
     },
     subtitle: {
-        ...typography.body,
-        color: colors.textSecondary,
-        marginBottom: spacing.xl,
-        textAlign: 'center',
+        fontSize: 16,
+        color: '#64748b',
+        fontWeight: '300',
     },
-    spacer: {
-        height: spacing.l,
-    }
+    form: {
+        backgroundColor: 'rgba(255, 255, 255, 0.4)',
+        padding: 24,
+        borderRadius: 24,
+        borderColor: 'rgba(255, 255, 255, 0.5)',
+        borderWidth: 1,
+    },
+    footer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginTop: 16,
+    },
+    footerText: {
+        color: '#64748b',
+    },
+    link: {
+        color: '#36e236',
+        fontWeight: 'bold',
+    },
 });
 
 export default RegisterScreen;

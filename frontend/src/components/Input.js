@@ -1,54 +1,44 @@
 import React from 'react';
-import { TextInput, View, Text, StyleSheet } from 'react-native';
-import { colors, spacing, typography } from '../theme';
+import { View, TextInput, StyleSheet } from 'react-native';
 
-const Input = ({ label, value, onChangeText, placeholder, secureTextEntry, error, style }) => {
+const Input = ({
+    placeholder,
+    value,
+    onChangeText,
+    secureTextEntry,
+    keyboardType,
+    icon
+}) => {
     return (
-        <View style={[styles.container, style]}>
-            {label && <Text style={styles.label}>{label}</Text>}
+        <View style={styles.container}>
             <TextInput
-                style={[styles.input, error && styles.inputError]}
+                style={styles.input}
+                placeholder={placeholder}
+                placeholderTextColor="#9ca3af"
                 value={value}
                 onChangeText={onChangeText}
-                placeholder={placeholder}
-                placeholderTextColor={colors.textSecondary}
                 secureTextEntry={secureTextEntry}
+                keyboardType={keyboardType}
                 autoCapitalize="none"
             />
-            {error && <Text style={styles.errorText}>{error}</Text>}
         </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
-        marginVertical: spacing.s,
-        width: '100%',
-    },
-    label: {
-        ...typography.caption,
-        fontSize: 14,
-        marginBottom: spacing.xs,
-        color: colors.text,
-        fontWeight: '600'
+        marginBottom: 16,
     },
     input: {
-        backgroundColor: colors.surface,
+        backgroundColor: 'rgba(255, 255, 255, 0.6)',
         borderWidth: 1,
-        borderColor: colors.border,
+        borderColor: 'rgba(255, 255, 255, 0.5)',
         borderRadius: 12,
-        padding: spacing.m,
+        paddingVertical: 16,
+        paddingHorizontal: 16,
         fontSize: 16,
-        color: colors.text,
+        color: '#1a2e1a',
     },
-    inputError: {
-        borderColor: colors.error,
-    },
-    errorText: {
-        color: colors.error,
-        fontSize: 12,
-        marginTop: spacing.xs,
-    }
 });
 
 export default Input;

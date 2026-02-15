@@ -1,89 +1,81 @@
 import { create } from 'zustand';
-import client from '../api/client';
+import { startSession, sendMessage } from '../api/chat';
 
 const useChatStore = create((set, get) => ({
-    messages: [],
     sessionId: null,
-    isLoading: false,
+    messages: [],
     isTyping: false,
-    crisisMode: false,
     error: null,
+    isCrisis: false,
 
-    setSessionId: (id) => set({ sessionId: id }),
-    setLoading: (loading) => set({ isLoading: loading }),
-    setTyping: (typing) => set({ isTyping: typing }),
-    addMessage: (message) => set((state) => ({ messages: [...state.messages, message] })),
-
-    reset: () => set({ messages: [], sessionId: null, isLoading: false, isTyping: false, crisisMode: false, error: null }),
-
-    startSession: async () => {
-        set({ isLoading: true, error: null });
+    // Start a new session or reset
+    initializeSession: async () => {
+        set({ isTyping: true, error: null });
         try {
-            // POST /chat/new-session
-            const res = await client.post('/chat/new-session');
-            set({ sessionId: res.data.sessionId, messages: [] });
-            console.log('Session started:', res.data.sessionId);
-        } catch (err) {
-            console.error('Start session error:', err);
-            set({ error: 'Failed to start chat session' });
+            const data = await startSession();
+            set({ sessionId: data.sessionId, messages: [] });
+            return data.sessionId;
+        } catch (error) {
+            set({ error: error.message || 'Failed to start session' });
+            return null;
         } finally {
-            set({ isLoading: false });
+            set({ isTyping: false });
         }
     },
 
-    sendMessage: async (text) => {
-        const { sessionId, addMessage, setTyping } = get();
-        if (!sessionId) return;
+    sendMessage: async (messageText) => {
+        const { sessionId, messages } = get();
+        if (!sessionId) {
+            set({ error: 'No active session' });
+            return;
+        }
 
-        // 1. Optimistic User Bubble
+        // Optimistic update: Add user message immediately
         const userMsg = {
             id: Date.now().toString(),
             role: 'user',
-            content: text,
+            content: messageText,
             timestamp: new Date().toISOString()
         };
-        addMessage(userMsg);
-        setTyping(true);
+
+        set({
+            messages: [...messages, userMsg],
+            isTyping: true,
+            error: null
+        });
 
         try {
-            // 2. API Call
-            const res = await client.post('/chat/message', {
-                sessionId,
-                message: text
+            const data = await sendMessage(sessionId, messageText);
+            // data.data { reply, isCrisis, emotion, resources }
+
+            const aiMsg = {
+                id: (Date.now() + 1).toString(),
+                role: 'assistant',
+                content: data.data.reply,
+                isCrisis: data.data.isCrisis,
+                emotion: data.data.emotion,
+                resources: data.data.resources, // If crisis
+                timestamp: new Date().toISOString()
+            };
+
+            set(state => ({
+                messages: [...state.messages, aiMsg],
+                isCrisis: data.data.isCrisis,
+                isTyping: false
+            }));
+
+        } catch (error) {
+            set({
+                error: error.message || 'Failed to send message',
+                isTyping: false,
+                // Optionally remove the user message or mark as failed
             });
-
-            const data = res.data.data; // { reply, emotion, isCrisis, resources? }
-
-            // 3. Handle Crisis
-            if (data.isCrisis) {
-                set({ crisisMode: true });
-                // Add crisis message from AI
-                addMessage({
-                    id: Date.now().toString() + '_ai',
-                    role: 'model',
-                    content: data.reply,
-                    isCrisis: true,
-                    resources: data.resources,
-                    timestamp: new Date().toISOString()
-                });
-            } else {
-                // 4. Normal AI Reply
-                addMessage({
-                    id: Date.now().toString() + '_ai',
-                    role: 'model',
-                    content: data.reply,
-                    emotion: data.emotion,
-                    timestamp: new Date().toISOString()
-                });
-            }
-
-        } catch (err) {
-            console.error('Send message error:', err);
-            set({ error: 'Failed to send message' });
-            // Optionally add an error system message
-        } finally {
-            setTyping(false);
         }
+    },
+
+    // Generic add message (if needed for restoring history)
+    setMessages: (history) => {
+        set({ messages: history });
     }
 }));
 

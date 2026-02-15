@@ -1,57 +1,68 @@
-import React, { useState, useContext } from 'react';
-import { View, Text, StyleSheet, Alert, SafeAreaView } from 'react-native';
-import { AuthContext } from '../context/AuthContext';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Alert, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import useAuthStore from '../stores/authStore';
 import Button from '../components/Button';
 import Input from '../components/Input';
-import { colors, spacing, typography } from '../theme';
 
 const LoginScreen = ({ navigation }) => {
-    const { login, isLoading } = useContext(AuthContext);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const { login, isLoading, error } = useAuthStore();
 
     const handleLogin = async () => {
         if (!email || !password) {
             Alert.alert('Error', 'Please fill in all fields');
             return;
         }
-        try {
-            await login(email, password);
-        } catch (error) {
-            const msg = error.response?.data?.message || 'Login failed';
-            Alert.alert('Login Error', msg);
+
+        const success = await login(email, password);
+        if (success) {
+            // Navigation is handled by AppNavigator based on auth state, 
+            // but we can explicitly navigate if needed or just wait for state change
+        } else {
+            Alert.alert('Login Failed', error || 'Something went wrong');
         }
     };
 
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.content}>
-                <Text style={styles.title}>Welcome Back</Text>
-                <Text style={styles.subtitle}>Sign in to continue your journey</Text>
+                <View style={styles.header}>
+                    <View style={styles.logoCircle}>
+                        <Text style={styles.logoText}>S</Text>
+                    </View>
+                    <Text style={styles.title}>Serenity</Text>
+                    <Text style={styles.subtitle}>Find your inner peace.</Text>
+                </View>
 
-                <Input
-                    label="Email"
-                    placeholder="Enter your email"
-                    value={email}
-                    onChangeText={setEmail}
-                />
-                <Input
-                    label="Password"
-                    placeholder="Enter your password"
-                    value={password}
-                    onChangeText={setPassword}
-                    secureTextEntry
-                />
+                <View style={styles.form}>
+                    <Input
+                        placeholder="hello@serenity.com"
+                        value={email}
+                        onChangeText={setEmail}
+                        keyboardType="email-address"
+                    />
+                    <Input
+                        placeholder="••••••••"
+                        value={password}
+                        onChangeText={setPassword}
+                        secureTextEntry
+                    />
 
-                <View style={styles.spacer} />
+                    <Button
+                        title="Login"
+                        onPress={handleLogin}
+                        loading={isLoading}
+                    />
 
-                <Button title="Login" onPress={handleLogin} loading={isLoading} />
-                <Button
-                    title="Create Account"
-                    variant="outline"
-                    onPress={() => navigation.navigate('Register')}
-                    disabled={isLoading}
-                />
+                    <View style={styles.footer}>
+                        <Text style={styles.footerText}>New here? </Text>
+                        <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+                            <Text style={styles.link}>Create Account</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
             </View>
         </SafeAreaView>
     );
@@ -60,27 +71,50 @@ const LoginScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: colors.background,
+        backgroundColor: '#f6f8f6', // background-light
+        justifyContent: 'center',
     },
     content: {
-        flex: 1,
+        padding: 24,
+    },
+    header: {
+        alignItems: 'center',
+        marginBottom: 40,
+    },
+    logoCircle: {
+        width: 80,
+        height: 80,
+        borderRadius: 40,
+        backgroundColor: 'rgba(255, 255, 255, 0.6)',
+        alignItems: 'center',
         justifyContent: 'center',
-        padding: spacing.l,
+        marginBottom: 16,
+        borderWidth: 1,
+        borderColor: 'rgba(54, 226, 54, 0.2)',
+    },
+    logoText: {
+        fontSize: 40,
+        color: '#36e236',
+        fontWeight: 'bold',
     },
     title: {
-        ...typography.h1,
-        marginBottom: spacing.xs,
-        textAlign: 'center',
+        fontSize: 28,
+        fontWeight: '600',
+        color: '#1a2e1a',
+        marginBottom: 4,
     },
     subtitle: {
-        ...typography.body,
-        color: colors.textSecondary,
-        marginBottom: spacing.xl,
-        textAlign: 'center',
+        fontSize: 16,
+        color: '#64748b',
+        fontWeight: '300',
     },
-    spacer: {
-        height: spacing.l,
-    }
+    form: {
+        backgroundColor: 'rgba(255, 255, 255, 0.4)',
+        padding: 24,
+        borderRadius: 24,
+        borderColor: 'rgba(255, 255, 255, 0.5)',
+        borderWidth: 1,
+    },
 });
 
 export default LoginScreen;

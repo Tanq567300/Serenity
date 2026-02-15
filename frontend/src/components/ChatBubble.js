@@ -1,35 +1,36 @@
 import React from 'react';
 import { View, Text, StyleSheet, Linking, TouchableOpacity } from 'react-native';
-import { colors, spacing, typography } from '../theme';
 
-const ChatBubble = ({ role, content, isCrisis, resources, timestamp }) => {
+const ChatBubble = ({ role, content, isCrisis, resources }) => {
     const isUser = role === 'user';
 
-    // Format timestamp (e.g. 10:30 AM)
-    const timeString = timestamp ? new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
-
+    // Crisis Bubble Styling
     if (isCrisis) {
         return (
-            <View style={[styles.container, styles.crisisContainer]}>
-                <Text style={[styles.text, styles.crisisText]}>{content}</Text>
-                {resources && resources.map((res, index) => (
-                    <TouchableOpacity
-                        key={index}
-                        style={styles.resourceButton}
-                        onPress={() => Linking.openURL('tel:988')} // Hardcoded for now based on typical crisis resource
-                    >
-                        <Text style={styles.resourceText}>{res.name}: {res.contact}</Text>
-                    </TouchableOpacity>
-                ))}
-                <Text style={styles.timestamp}>{timeString}</Text>
+            <View style={[styles.bubble, styles.crisisBubble]}>
+                <Text style={styles.crisisTitle}>Critical Support</Text>
+                <Text style={styles.crisisText}>{content}</Text>
+                {resources && resources.length > 0 && (
+                    <View style={styles.resourceContainer}>
+                        {resources.map((res, index) => (
+                            <TouchableOpacity
+                                key={index}
+                                style={styles.resourceButton}
+                                onPress={() => Linking.openURL(res.url)}
+                            >
+                                <Text style={styles.resourceButtonText}>{res.name}: {res.contact}</Text>
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+                )}
             </View>
         );
     }
 
     return (
         <View style={[
-            styles.container,
-            isUser ? styles.userContainer : styles.aiContainer
+            styles.bubble,
+            isUser ? styles.userBubble : styles.aiBubble
         ]}>
             <Text style={[
                 styles.text,
@@ -37,77 +38,72 @@ const ChatBubble = ({ role, content, isCrisis, resources, timestamp }) => {
             ]}>
                 {content}
             </Text>
-            <Text style={[styles.timestamp, isUser ? styles.userTimestamp : styles.aiTimestamp]}>
-                {timeString}
-            </Text>
         </View>
     );
 };
 
 const styles = StyleSheet.create({
-    container: {
+    bubble: {
         maxWidth: '80%',
-        padding: spacing.m,
+        padding: 12,
         borderRadius: 20,
-        marginVertical: spacing.xs,
+        marginVertical: 4,
     },
-    userContainer: {
+    userBubble: {
         alignSelf: 'flex-end',
-        backgroundColor: colors.userBubble,
+        backgroundColor: '#36e236', // Primary Green
         borderBottomRightRadius: 4,
     },
-    aiContainer: {
+    aiBubble: {
         alignSelf: 'flex-start',
-        backgroundColor: colors.aiBubble,
+        backgroundColor: '#ffffff',
         borderBottomLeftRadius: 4,
-    },
-    crisisContainer: {
-        alignSelf: 'center',
-        backgroundColor: colors.crisis,
-        width: '90%',
-        borderColor: colors.error,
         borderWidth: 1,
+        borderColor: '#e8f3e8', // Sage
     },
     text: {
-        ...typography.body,
         fontSize: 16,
+        lineHeight: 22,
     },
     userText: {
-        color: colors.userText,
+        color: '#0e1b0e', // Dark Green/Black for contrast
     },
     aiText: {
-        color: colors.aiText,
+        color: '#1a2e1a',
+    },
+    // Crisis Styles
+    crisisBubble: {
+        alignSelf: 'center',
+        width: '90%',
+        backgroundColor: '#fff5f5',
+        borderColor: '#fc8181',
+        borderWidth: 1,
+        borderRadius: 12,
+    },
+    crisisTitle: {
+        fontWeight: 'bold',
+        color: '#c53030',
+        marginBottom: 8,
+        fontSize: 16,
     },
     crisisText: {
-        color: colors.crisisText,
-        fontWeight: '600',
-        textAlign: 'center',
-        marginBottom: spacing.s
+        color: '#2d3748',
+        marginBottom: 12,
     },
-    timestamp: {
-        ...typography.caption,
-        fontSize: 10,
-        marginTop: spacing.xs,
-        alignSelf: 'flex-end',
-        opacity: 0.7
-    },
-    userTimestamp: {
-        color: 'rgba(255, 255, 255, 0.8)',
-    },
-    aiTimestamp: {
-        color: colors.textSecondary,
+    resourceContainer: {
+        marginTop: 8,
+        gap: 8,
     },
     resourceButton: {
-        backgroundColor: colors.error,
-        padding: spacing.s,
+        backgroundColor: '#c53030',
+        padding: 10,
         borderRadius: 8,
-        marginTop: spacing.s,
-        alignItems: 'center'
+        alignItems: 'center',
     },
-    resourceText: {
-        color: '#FFF',
-        fontWeight: 'bold'
-    }
+    resourceButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
+    },
 });
 
 export default ChatBubble;

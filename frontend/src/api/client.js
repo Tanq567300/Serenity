@@ -1,27 +1,31 @@
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
-
-// NOTE: For Android Emulator usa '10.0.2.2' instead of 'localhost'
-// For iOS Simulator or Web 'localhost' is fine.
-// Adjust this based on where you are running the app.
-const BASE_URL = 'http://localhost:5012/api';
+import { API_URL } from '../config';
 
 const client = axios.create({
-    baseURL: BASE_URL,
+    baseURL: API_URL,
     headers: {
         'Content-Type': 'application/json',
     },
 });
 
-client.interceptors.request.use(
-    async (config) => {
-        const token = await SecureStore.getItemAsync('userToken');
+client.interceptors.request.use(async (config) => {
+    try {
+        const token = await SecureStore.getItemAsync('accessToken');
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
-        return config;
-    },
+    } catch (error) {
+        console.error('Error getting token', error);
+    }
+    return config;
+});
+
+client.interceptors.response.use(
+    (response) => response,
     (error) => {
+        // Handle 401 triggers here (e.g. token refresh or logout)
+        // For now just reject
         return Promise.reject(error);
     }
 );

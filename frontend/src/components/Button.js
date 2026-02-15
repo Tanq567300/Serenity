@@ -1,66 +1,47 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, ActivityIndicator } from 'react-native';
-import { colors, spacing, typography } from '../theme';
+import { TouchableOpacity, Text, ActivityIndicator, StyleSheet } from 'react-native';
 
-const Button = ({ title, onPress, variant = 'primary', loading = false, disabled = false, style }) => {
-    const isPrimary = variant === 'primary';
-
+const Button = ({ title, onPress, loading, disabled, style, textStyle }) => {
     return (
         <TouchableOpacity
             style={[
-                styles.container,
-                isPrimary ? styles.primary : styles.outline,
-                (disabled || loading) && styles.disabled,
-                style
+                styles.button,
+                style,
+                (disabled || loading) && styles.disabled
             ]}
             onPress={onPress}
             disabled={disabled || loading}
         >
             {loading ? (
-                <ActivityIndicator color={isPrimary ? '#FFF' : colors.primary} />
+                <ActivityIndicator color="#0e1b0e" />
             ) : (
-                <Text style={[styles.text, isPrimary ? styles.textPrimary : styles.textOutline]}>
-                    {title}
-                </Text>
+                <Text style={[styles.text, textStyle]}>{title}</Text>
             )}
         </TouchableOpacity>
     );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        paddingVertical: spacing.m,
-        paddingHorizontal: spacing.l,
-        borderRadius: 16, // Soft rounded
+    button: {
+        backgroundColor: '#36e236',
+        paddingVertical: 16,
+        paddingHorizontal: 24,
+        borderRadius: 12, // Rounded corners matching design
         alignItems: 'center',
         justifyContent: 'center',
-        marginVertical: spacing.s,
+        shadowColor: '#36e236',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 4,
     },
-    primary: {
-        backgroundColor: colors.primary,
-        elevation: 2,
-        shadowColor: colors.primary,
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
-        shadowRadius: 4,
-    },
-    outline: {
-        backgroundColor: 'transparent',
-        borderWidth: 1,
-        borderColor: colors.primary,
+    text: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#0e1b0e', // Dark text on bright button
     },
     disabled: {
         opacity: 0.6,
-    },
-    text: {
-        ...typography.button,
-        fontSize: 16,
-    },
-    textPrimary: {
-        color: '#FFFFFF',
-    },
-    textOutline: {
-        color: colors.primary,
     }
 });
 
