@@ -31,11 +31,13 @@ const limiter = rateLimit({
 app.use(limiter);
 
 const chatRoutes = require('./routes/chat.routes');
+const dailyMemoryRoutes = require('./routes/dailyMemory.routes');
 
 // Routes
 app.use('/api/health', healthRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/memory', dailyMemoryRoutes);
 app.use('/api/mood', (req, res, next) => {
     res.status(501).json({ message: "Not Implemented" });
 });

@@ -4,6 +4,7 @@ const { encrypt, decrypt } = require('../utils/encryption');
 const crisisService = require('./crisisService');
 const emotionService = require('./emotionService');
 const aiService = require('./aiService');
+const dailyMemoryService = require('./dailyMemoryService');
 
 /**
  * Process a user message in a chat session.
@@ -23,6 +24,12 @@ async function processUserMessage(userId, sessionId, messageText) {
     if (!session) {
         throw new Error('Invalid or inactive session');
     }
+
+    // TRIGGER: Check/Generate Daily Memory for Yesterday (Async/Fire-and-Forget)
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    dailyMemoryService.createDailyMemory(userId, yesterday)
+        .catch(err => console.error('Daily Memory Trigger Error:', err));
 
     // 2. Crisis Detection
     const crisisResult = crisisService.detectCrisis(messageText);
