@@ -43,7 +43,26 @@ async function generateChatResponse({ message, sessionContext = [] }) {
     }
 }
 
+async function generateStructuredSummary(promptText) {
+    try {
+        const model = genAI.getGenerativeModel({
+            model: MODEL_NAME,
+            generationConfig: {
+                responseMimeType: "application/json"
+            }
+        });
+
+        const result = await model.generateContent(promptText);
+        const response = await result.response;
+        return response.text();
+    } catch (error) {
+        console.error('Gemini Summary Error:', error);
+        throw new Error('Failed to generate summary');
+    }
+}
+
 module.exports = {
     generateChatResponse,
-    genAI // Exporting instance if needed by other services
+    generateStructuredSummary,
+    genAI
 };
