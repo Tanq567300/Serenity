@@ -8,7 +8,7 @@ import TypingIndicator from '../components/TypingIndicator';
 import DailySummaryCard from '../components/DailySummaryCard';
 import { getDailyMemory } from '../services/memoryApi';
 
-const ChatScreen = () => {
+const ChatScreen = ({ navigation }) => {
     // Store hooks
     const {
         messages,
@@ -69,6 +69,13 @@ const ChatScreen = () => {
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
+                <TouchableOpacity
+                    onPress={() => navigation.navigate('PatternDashboard')}
+                    style={styles.insightsButton}
+                >
+                    <Text style={styles.logoutText}>Insights</Text>
+                </TouchableOpacity>
+
                 <Text style={styles.headerTitle}>Serenity AI</Text>
                 <View style={styles.statusDot} />
                 <TouchableOpacity onPress={logout} style={styles.logoutButton}>
@@ -158,6 +165,11 @@ const styles = StyleSheet.create({
     logoutButton: {
         position: 'absolute',
         right: 16,
+        padding: 8,
+    },
+    insightsButton: {
+        position: 'absolute',
+        left: 16,
         padding: 8,
     },
     logoutText: {

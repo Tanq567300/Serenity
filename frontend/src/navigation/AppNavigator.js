@@ -6,6 +6,7 @@ import useAuthStore from '../stores/authStore';
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import ChatScreen from '../screens/ChatScreen';
+import PatternDashboardScreen from '../screens/PatternDashboardScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -28,7 +29,10 @@ const AppNavigator = () => {
         <NavigationContainer>
             <Stack.Navigator screenOptions={{ headerShown: false }}>
                 {isAuthenticated ? (
-                    <Stack.Screen name="Chat" component={ChatScreen} />
+                    <>
+                        <Stack.Screen name="Chat" component={ChatScreen} />
+                        <Stack.Screen name="PatternDashboard" component={PatternDashboardScreen} />
+                    </>
                 ) : (
                     <>
                         <Stack.Screen name="Login" component={LoginScreen} />
