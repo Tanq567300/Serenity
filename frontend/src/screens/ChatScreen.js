@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, FlatList, StyleSheet, KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import useAuthStore from '../stores/authStore';
+import { MaterialIcons } from '@expo/vector-icons';
 import useChatStore from '../stores/chatStore';
 import ChatBubble from '../components/ChatBubble';
 import TypingIndicator from '../components/TypingIndicator';
@@ -18,7 +18,9 @@ const ChatScreen = ({ navigation }) => {
         sendMessage,
         error
     } = useChatStore();
-    const { logout } = useAuthStore();
+
+    // Auth store removed (logout handled in Profile)
+
     const [inputText, setInputText] = useState('');
     const [dailyMemory, setDailyMemory] = useState(null);
     const [selectedDate, setSelectedDate] = useState(new Date());
@@ -35,10 +37,6 @@ const ChatScreen = ({ navigation }) => {
             setDailyMemory(memory);
         } catch (err) {
             console.log('Failed to fetch memory', err);
-            if (err.response && err.response.status === 401) {
-                // Token expired or invalid
-                // Ideally trigger logout here
-            }
             setDailyMemory(null);
         }
     };
@@ -69,17 +67,12 @@ const ChatScreen = ({ navigation }) => {
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
-                <TouchableOpacity
-                    onPress={() => navigation.navigate('PatternDashboard')}
-                    style={styles.insightsButton}
-                >
-                    <Text style={styles.logoutText}>Insights</Text>
-                </TouchableOpacity>
-
                 <Text style={styles.headerTitle}>Serenity AI</Text>
                 <View style={styles.statusDot} />
-                <TouchableOpacity onPress={logout} style={styles.logoutButton}>
-                    <Text style={styles.logoutText}>Logout</Text>
+
+                {/* Close Button (Modal style) */}
+                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.closeButton}>
+                    <MaterialIcons name="close" size={24} color="#64748b" />
                 </TouchableOpacity>
             </View>
 
@@ -149,6 +142,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: 'rgba(255,255,255,0.8)',
+        position: 'relative', // for absolute positioning of close button
     },
     headerTitle: {
         fontSize: 18,
@@ -162,19 +156,10 @@ const styles = StyleSheet.create({
         backgroundColor: '#36e236',
         marginLeft: 8,
     },
-    logoutButton: {
+    closeButton: {
         position: 'absolute',
         right: 16,
         padding: 8,
-    },
-    insightsButton: {
-        position: 'absolute',
-        left: 16,
-        padding: 8,
-    },
-    logoutText: {
-        color: '#64748b',
-        fontSize: 12,
     },
     listContent: {
         padding: 16,

@@ -2,14 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { getUserPattern } from '../services/patternApi';
-import { useNavigation } from '@react-navigation/native';
 import BaselineMoodCard from '../components/BaselineMoodCard';
 import MoodTrendCard from '../components/MoodTrendCard';
 import DominantEmotionCard from '../components/DominantEmotionCard';
 import RecurringTagsCard from '../components/RecurringTagsCard';
 
 const PatternDashboardScreen = () => {
-    const navigation = useNavigation();
     const [pattern, setPattern] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -31,9 +29,7 @@ const PatternDashboardScreen = () => {
         fetchPattern();
     }, []);
 
-    const handleBack = () => {
-        navigation.goBack();
-    };
+
 
     if (loading) {
         return (
@@ -50,9 +46,7 @@ const PatternDashboardScreen = () => {
         return (
             <SafeAreaView style={styles.container}>
                 <View style={styles.header}>
-                    <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-                        <Text style={styles.backButtonText}>← Back</Text>
-                    </TouchableOpacity>
+                    <Text style={styles.headerTitle}>Insights</Text>
                 </View>
                 <View style={styles.centerContainer}>
                     <Text style={styles.errorText}>{error}</Text>
@@ -66,11 +60,7 @@ const PatternDashboardScreen = () => {
         return (
             <SafeAreaView style={styles.container}>
                 <View style={styles.header}>
-                    <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-                        <Text style={styles.backButtonText}>← Back</Text>
-                    </TouchableOpacity>
                     <Text style={styles.headerTitle}>Insights</Text>
-                    <View style={{ width: 60 }} /> {/* Spacer */}
                 </View>
                 <View style={styles.centerContainer}>
                     <Text style={styles.placeholderTitle}>Gathering Insights 🌱</Text>
@@ -85,11 +75,7 @@ const PatternDashboardScreen = () => {
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
-                <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-                    <Text style={styles.backButtonText}>← Back</Text>
-                </TouchableOpacity>
                 <Text style={styles.headerTitle}>Insights</Text>
-                <View style={{ width: 60 }} /> {/* Spacer */}
             </View>
 
             <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -116,25 +102,17 @@ const styles = StyleSheet.create({
     header: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between',
+        justifyContent: 'center', // Center title
         paddingHorizontal: 16,
-        paddingVertical: 12,
+        paddingVertical: 16,
         backgroundColor: 'rgba(255,255,255,0.8)',
         borderBottomWidth: 1,
         borderBottomColor: 'rgba(0,0,0,0.05)',
     },
     headerTitle: {
-        fontSize: 18,
-        fontWeight: '600',
+        fontSize: 20,
+        fontWeight: 'bold',
         color: '#1a2e1a',
-    },
-    backButton: {
-        padding: 8,
-    },
-    backButtonText: {
-        color: '#36e236',
-        fontSize: 16,
-        fontWeight: '500',
     },
     scrollContent: {
         padding: 16,
