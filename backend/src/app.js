@@ -23,10 +23,12 @@ if (config.env === 'development') {
     app.use(morgan('combined'));
 }
 
-// Rate Limiting
+// Rate Limiting — relaxed in dev to avoid 429s during hot-reload
 const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // limit each IP to 100 requests per windowMs
+    windowMs: 15 * 60 * 1000,
+    max: config.env === 'development' ? 1000 : 150,
+    standardHeaders: true,
+    legacyHeaders: false,
 });
 app.use(limiter);
 
@@ -40,6 +42,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/memory/pattern', patternMemoryRoutes); // Distinct path
 app.use('/api/memory', dailyMemoryRoutes);
+app.use('/api/dashboard', require('./routes/dashboard.routes'));
 app.use('/api/mood', (req, res, next) => {
     res.status(501).json({ message: "Not Implemented" });
 });

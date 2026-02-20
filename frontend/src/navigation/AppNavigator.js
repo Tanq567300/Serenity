@@ -6,6 +6,7 @@ import useAuthStore from '../stores/authStore';
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import ChatScreen from '../screens/ChatScreen';
+import MainTabNavigator from './MainTabNavigator';
 
 const Stack = createNativeStackNavigator();
 
@@ -28,7 +29,19 @@ const AppNavigator = () => {
         <NavigationContainer>
             <Stack.Navigator screenOptions={{ headerShown: false }}>
                 {isAuthenticated ? (
-                    <Stack.Screen name="Chat" component={ChatScreen} />
+                    <>
+                        {/* Main Tabs is the default authenticated screen */}
+                        <Stack.Screen name="MainTabs" component={MainTabNavigator} />
+                        {/* Chat is now a secondary screen accessed via FAB */}
+                        <Stack.Screen
+                            name="Chat"
+                            component={ChatScreen}
+                            options={{
+                                animation: 'slide_from_bottom', // Nice transition for modal-like feel
+                                presentation: 'card',
+                            }}
+                        />
+                    </>
                 ) : (
                     <>
                         <Stack.Screen name="Login" component={LoginScreen} />

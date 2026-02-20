@@ -1,54 +1,106 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, FlatList, StyleSheet, KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity } from 'react-native';
+import {
+    View, FlatList, StyleSheet, KeyboardAvoidingView, Platform,
+    Text, TextInput, TouchableOpacity, ScrollView, Animated, Modal,
+    TouchableWithoutFeedback, Alert
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import useAuthStore from '../stores/authStore';
+import { MaterialIcons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
 import useChatStore from '../stores/chatStore';
 import ChatBubble from '../components/ChatBubble';
 import TypingIndicator from '../components/TypingIndicator';
-import DailySummaryCard from '../components/DailySummaryCard';
-import { getDailyMemory } from '../services/memoryApi';
 
-const ChatScreen = () => {
-    // Store hooks
-    const {
-        messages,
-        isTyping,
-        isCrisis,
-        initializeSession,
-        sendMessage,
-        error
-    } = useChatStore();
-    const { logout } = useAuthStore();
+// Simulates CSS filter:blur(60px) using layered semi-transparent circles
+// Works on both iOS and Android — no native modules needed.
+const GlowOrb = ({ color, size, style }) => {
+    const layers = [
+        { scale: 2.2, opacity: 0.04 },
+        { scale: 1.8, opacity: 0.07 },
+        { scale: 1.45, opacity: 0.11 },
+        { scale: 1.15, opacity: 0.18 },
+        { scale: 0.8, opacity: 0.26 },
+    ];
+    return (
+        <View pointerEvents="none" style={[{ position: 'absolute', width: size, height: size, alignItems: 'center', justifyContent: 'center' }, style]}>
+            {layers.map((l, i) => (
+                <View key={i} style={{
+                    position: 'absolute',
+                    width: size * l.scale,
+                    height: size * l.scale,
+                    borderRadius: size * l.scale,
+                    backgroundColor: color,
+                    opacity: l.opacity,
+                }} />
+            ))}
+        </View>
+    );
+};
+
+// Context-aware smart suggestions based on the last AI message
+const getSmartSuggestions = (messages) => {
+    if (!messages || messages.length === 0) {
+        return ["I'm feeling anxious", "I need to vent", "Help me breathe"];
+    }
+    const lastAI = [...messages].reverse().find(m => m.role === 'assistant');
+    if (!lastAI) return ["I'm feeling anxious", "I need to vent", "Help me breathe"];
+
+    const text = (lastAI.content || '').toLowerCase();
+
+    if (text.includes('breath') || text.includes('grounding') || text.includes('exercise')) {
+        return ["Yes, let's try breathing", "I'd rather vent", "What is grounding?"];
+    }
+    if (text.includes('anxious') || text.includes('anxiety') || text.includes('panic')) {
+        return ["Tell me more techniques", "I feel overwhelmed", "Help me relax"];
+    }
+    if (text.includes('sad') || text.includes('grief') || text.includes('loss')) {
+        return ["I want to talk about it", "Give me a distraction", "I need support"];
+    }
+    if (text.includes('sleep') || text.includes('tired') || text.includes('rest')) {
+        return ["Help me sleep better", "I'm exhausted", "Relaxation tips"];
+    }
+    if (text.includes('work') || text.includes('stress') || text.includes('overwhelm')) {
+        return ["Work is too much", "Help me prioritize", "I need to relax"];
+    }
+    if (text.includes('gratitude') || text.includes('positive') || text.includes('great')) {
+        return ["I'm feeling grateful", "Share more positivity", "I want to journal this"];
+    }
+    // Default fallback suggestions
+    return ["I'm feeling anxious", "I need to vent", "Tell me a breathing exercise"];
+};
+
+const ChatScreen = ({ navigation, route }) => {
+    const initialMessage = route?.params?.initialMessage || null;
+
+    const { messages, isTyping, isCrisis, initializeSession, sendMessage, clearChat, error } = useChatStore();
+
     const [inputText, setInputText] = useState('');
-    const [dailyMemory, setDailyMemory] = useState(null);
-    const [selectedDate, setSelectedDate] = useState(new Date());
+    const [menuVisible, setMenuVisible] = useState(false);
     const flatListRef = useRef(null);
+    const pulseAnim = useRef(new Animated.Value(1)).current;
 
+    // Breathing/pulse animation for the avatar
     useEffect(() => {
-        initializeSession();
-        fetchDailyMemory(selectedDate);
+        const loop = Animated.loop(
+            Animated.sequence([
+                Animated.timing(pulseAnim, { toValue: 1.2, duration: 1200, useNativeDriver: true }),
+                Animated.timing(pulseAnim, { toValue: 1.0, duration: 1200, useNativeDriver: true }),
+            ])
+        );
+        loop.start();
+        return () => loop.stop();
     }, []);
 
-    const fetchDailyMemory = async (date) => {
-        try {
-            const memory = await getDailyMemory(date);
-            setDailyMemory(memory);
-        } catch (err) {
-            console.log('Failed to fetch memory', err);
-            if (err.response && err.response.status === 401) {
-                // Token expired or invalid
-                // Ideally trigger logout here
+    // Init session
+    useEffect(() => {
+        const init = async () => {
+            await initializeSession();
+            if (initialMessage) {
+                await sendMessage(initialMessage);
             }
-            setDailyMemory(null);
-        }
-    };
-
-    const handleDateChange = (days) => {
-        const newDate = new Date(selectedDate);
-        newDate.setDate(selectedDate.getDate() + days);
-        setSelectedDate(newDate);
-        fetchDailyMemory(newDate);
-    };
+        };
+        init();
+    }, []);
 
     const handleSend = async () => {
         if (!inputText.trim()) return;
@@ -56,6 +108,24 @@ const ChatScreen = () => {
         setInputText('');
         await sendMessage(text);
     };
+
+    const handleSuggestion = async (text) => {
+        await sendMessage(text);
+    };
+
+    const handleClearChat = () => {
+        setMenuVisible(false);
+        Alert.alert(
+            'Clear Chat',
+            'Start a fresh conversation? Your current chat will be cleared.',
+            [
+                { text: 'Cancel', style: 'cancel' },
+                { text: 'Clear', style: 'destructive', onPress: () => clearChat() },
+            ]
+        );
+    };
+
+    const suggestions = getSmartSuggestions(messages);
 
     const renderItem = ({ item }) => (
         <ChatBubble
@@ -67,158 +137,386 @@ const ChatScreen = () => {
     );
 
     return (
-        <SafeAreaView style={styles.container}>
-            <View style={styles.header}>
-                <Text style={styles.headerTitle}>Serenity AI</Text>
-                <View style={styles.statusDot} />
-                <TouchableOpacity onPress={logout} style={styles.logoutButton}>
-                    <Text style={styles.logoutText}>Logout</Text>
-                </TouchableOpacity>
-            </View>
+        <View style={styles.root}>
+            {/* Ambient background */}
+            <View style={[StyleSheet.absoluteFill, { backgroundColor: '#f0fdf4' }]} />
 
-            <View style={styles.summaryContainer}>
-                <TouchableOpacity onPress={() => handleDateChange(-1)} style={styles.navButton}>
-                    <Text style={styles.navArrow}>{'<'}</Text>
-                </TouchableOpacity>
-                <View style={{ flex: 1 }}>
-                    <DailySummaryCard memory={dailyMemory} />
-                </View>
-                <TouchableOpacity onPress={() => handleDateChange(1)} style={styles.navButton}>
-                    <Text style={styles.navArrow}>{'>'}</Text>
-                </TouchableOpacity>
-            </View>
+            {/* Soft-blur orbs */}
+            <GlowOrb color="#36e236" size={300} style={{ top: -120, left: -100 }} />
+            <GlowOrb color="#a78bfa" size={280} style={{ bottom: -60, right: -80 }} />
+            <GlowOrb color="#5eead4" size={240} style={{ top: '38%', left: '15%' }} />
 
-            <FlatList
-                ref={flatListRef}
-                data={messages}
-                renderItem={renderItem}
-                keyExtractor={item => item.id}
-                contentContainerStyle={styles.listContent}
-                onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
-                ListFooterComponent={
-                    <>
-                        {isTyping && <TypingIndicator />}
-                        {error && <Text style={{ color: 'red', textAlign: 'center', marginTop: 10 }}>{error}</Text>}
-                    </>
-                }
+            {/* BlurView on top of the orbs — blurs them into a soft atmospheric haze */}
+            <BlurView
+                intensity={55}
+                tint="light"
+                experimentalBlurMethod="dimezisBlurView"
+                style={StyleSheet.absoluteFill}
+                pointerEvents="none"
             />
 
-            <KeyboardAvoidingView
-                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-                keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
-            >
-                <View style={styles.inputContainer}>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Type a message..."
-                        placeholderTextColor="#9ca3af"
-                        value={inputText}
-                        onChangeText={setInputText}
-                        multiline
-                    />
-                    <TouchableOpacity
-                        style={[styles.sendButton, !inputText.trim() && styles.disabledSend]}
-                        onPress={handleSend}
-                        disabled={!inputText.trim() || isTyping}
-                    >
-                        <Text style={styles.sendButtonText}>→</Text>
+            <SafeAreaView style={styles.safeArea} edges={['top']}>
+                {/* ── Header ── */}
+                <View style={styles.header}>
+                    {/* Back button */}
+                    <TouchableOpacity style={styles.headerBtn} onPress={() => navigation.goBack()}>
+                        <MaterialIcons name="arrow-back" size={22} color="#0e1b0e" />
+                    </TouchableOpacity>
+
+                    {/* Center: Avatar + listening text */}
+                    <View style={styles.headerCenter}>
+                        <View style={styles.avatarWrapper}>
+                            {/* Pulse ring */}
+                            <Animated.View style={[styles.avatarPulse, { transform: [{ scale: pulseAnim }] }]} />
+                            {/* Avatar */}
+                            <View style={styles.avatar}>
+                                <MaterialIcons name="spa" size={22} color="#fff" />
+                            </View>
+                        </View>
+                        <View style={styles.listeningRow}>
+                            <View style={styles.listeningDot} />
+                            <Text style={styles.listeningText}>Serenity AI is listening...</Text>
+                        </View>
+                    </View>
+
+                    {/* More options */}
+                    <TouchableOpacity style={styles.headerBtn} onPress={() => setMenuVisible(true)}>
+                        <MaterialIcons name="more-horiz" size={22} color="#0e1b0e" />
                     </TouchableOpacity>
                 </View>
-            </KeyboardAvoidingView>
-        </SafeAreaView>
+
+                {/* ── Dropdown Menu Modal ── */}
+                <Modal
+                    visible={menuVisible}
+                    transparent
+                    animationType="fade"
+                    onRequestClose={() => setMenuVisible(false)}
+                >
+                    <TouchableWithoutFeedback onPress={() => setMenuVisible(false)}>
+                        <View style={styles.menuOverlay} />
+                    </TouchableWithoutFeedback>
+                    <View style={styles.menuCard}>
+                        <TouchableOpacity style={styles.menuItem} onPress={handleClearChat}>
+                            <MaterialIcons name="delete-outline" size={20} color="#ef4444" />
+                            <Text style={styles.menuItemTextDanger}>Clear Chat</Text>
+                        </TouchableOpacity>
+                    </View>
+                </Modal>
+
+                {/* ── Messages ── */}
+                <FlatList
+                    ref={flatListRef}
+                    data={messages}
+                    renderItem={renderItem}
+                    keyExtractor={item => item.id}
+                    contentContainerStyle={styles.listContent}
+                    showsVerticalScrollIndicator={false}
+                    onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
+                    ListFooterComponent={
+                        <>
+                            {isTyping && <TypingIndicator />}
+                            {error && <Text style={styles.errorText}>{error}</Text>}
+                        </>
+                    }
+                />
+
+                {/* ── Footer ── */}
+                <KeyboardAvoidingView
+                    behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+                    keyboardVerticalOffset={Platform.OS === 'ios' ? 10 : 0}
+                >
+                    <View style={styles.footer}>
+                        {/* Smart suggestions */}
+                        <ScrollView
+                            horizontal
+                            showsHorizontalScrollIndicator={false}
+                            contentContainerStyle={styles.suggestionsRow}
+                        >
+                            {suggestions.map((suggestion, i) => (
+                                <TouchableOpacity
+                                    key={i}
+                                    style={styles.chip}
+                                    onPress={() => handleSuggestion(suggestion)}
+                                    disabled={isTyping}
+                                >
+                                    <Text style={styles.chipText}>{suggestion}</Text>
+                                </TouchableOpacity>
+                            ))}
+                        </ScrollView>
+
+                        {/* Input bar */}
+                        <View style={styles.inputBar}>
+                            <TouchableOpacity style={styles.inputIconBtn}>
+                                <MaterialIcons name="add" size={22} color="#9ca3af" />
+                            </TouchableOpacity>
+
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Tell me what's on your mind..."
+                                placeholderTextColor="#9ca3af"
+                                value={inputText}
+                                onChangeText={setInputText}
+                                multiline
+                                onSubmitEditing={handleSend}
+                            />
+
+                            <View style={styles.inputRightGroup}>
+                                <TouchableOpacity style={styles.inputIconBtn}>
+                                    <MaterialIcons name="mic" size={22} color="#36e236" />
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={[styles.sendBtn, !inputText.trim() && styles.sendBtnDimmed]}
+                                    onPress={handleSend}
+                                    disabled={!inputText.trim() || isTyping}
+                                >
+                                    <MaterialIcons name="send" size={18} color="#fff" />
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </View>
+                </KeyboardAvoidingView>
+            </SafeAreaView>
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
-    container: {
+    root: {
         flex: 1,
-        backgroundColor: '#f6f8f6',
+        backgroundColor: '#f0fdf4',
     },
-    header: {
-        padding: 16,
-        borderBottomWidth: 1,
-        borderBottomColor: 'rgba(0,0,0,0.05)',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: 'rgba(255,255,255,0.8)',
+    safeArea: {
+        flex: 1,
     },
-    headerTitle: {
-        fontSize: 18,
-        fontWeight: '600',
-        color: '#1a2e1a',
-    },
-    statusDot: {
-        width: 8,
-        height: 8,
-        borderRadius: 4,
-        backgroundColor: '#36e236',
-        marginLeft: 8,
-    },
-    logoutButton: {
+
+    // ── Orbs ──
+    orbBlur: {
         position: 'absolute',
-        right: 16,
-        padding: 8,
+        borderRadius: 9999,
+        overflow: 'hidden',
     },
-    logoutText: {
-        color: '#64748b',
-        fontSize: 12,
+    orb: {
+        borderRadius: 9999,
     },
-    listContent: {
-        padding: 16,
-        paddingBottom: 20,
+    orbTopLeft: {
+        width: 400,
+        height: 400,
+        backgroundColor: 'rgba(54, 226, 54, 0.22)',
     },
-    summaryContainer: {
+    orbBottomRight: {
+        width: 340,
+        height: 340,
+        backgroundColor: 'rgba(167, 139, 250, 0.28)',
+    },
+    orbMid: {
+        width: 300,
+        height: 300,
+        backgroundColor: 'rgba(153, 246, 228, 0.35)',
+    },
+
+    // ── Header ──
+    header: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 10,
-        paddingBottom: 10,
-        backgroundColor: '#f6f8f6',
-        zIndex: 1,
+        justifyContent: 'space-between',
+        paddingHorizontal: 20,
+        paddingVertical: 14,
+        zIndex: 10,
     },
-    navButton: {
-        padding: 10,
+    headerBtn: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: 'rgba(255,255,255,0.45)',
+        alignItems: 'center',
         justifyContent: 'center',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.6)',
     },
-    navArrow: {
-        fontSize: 24,
-        color: '#94a3b8',
-        fontWeight: 'bold',
-    },
-    inputContainer: {
-        flexDirection: 'row',
-        padding: 16,
-        backgroundColor: '#fff',
-        borderTopWidth: 1,
-        borderTopColor: '#f0f0f0',
+    headerCenter: {
         alignItems: 'center',
+        gap: 6,
+    },
+    avatarWrapper: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: 48,
+        height: 48,
+    },
+    avatarPulse: {
+        position: 'absolute',
+        width: 48,
+        height: 48,
+        borderRadius: 14,
+        backgroundColor: 'rgba(54, 226, 54, 0.2)',
+    },
+    avatar: {
+        width: 40,
+        height: 40,
+        borderRadius: 12,
+        backgroundColor: '#36e236',
+        alignItems: 'center',
+        justifyContent: 'center',
+        shadowColor: '#36e236',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.35,
+        shadowRadius: 8,
+        elevation: 4,
+    },
+    listeningRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+    },
+    listeningDot: {
+        width: 7,
+        height: 7,
+        borderRadius: 3.5,
+        backgroundColor: '#36e236',
+    },
+    listeningText: {
+        fontSize: 12,
+        fontWeight: '500',
+        color: 'rgba(14, 27, 14, 0.75)',
+        letterSpacing: 0.2,
+    },
+
+    // ── Messages ──
+    listContent: {
+        paddingHorizontal: 20,
+        paddingVertical: 16,
+        gap: 10,
+    },
+    errorText: {
+        color: '#ef4444',
+        textAlign: 'center',
+        marginTop: 8,
+        fontSize: 13,
+    },
+
+    // ── Footer ──
+    footer: {
+        paddingHorizontal: 20,
+        paddingBottom: 24,
+        paddingTop: 12,
+        gap: 14,
+        zIndex: 10,
+    },
+
+    // Suggestion chips
+    suggestionsRow: {
+        gap: 10,
+        paddingRight: 8,
+    },
+    chip: {
+        height: 38,
+        paddingHorizontal: 18,
+        borderRadius: 99,
+        backgroundColor: 'rgba(255, 255, 255, 0.65)',
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.85)',
+        alignItems: 'center',
+        justifyContent: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
+        elevation: 1,
+    },
+    chipText: {
+        fontSize: 13,
+        fontWeight: '500',
+        color: '#0e1b0e',
+        whiteSpace: 'nowrap',
+    },
+
+    // Input bar
+    inputBar: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: 'rgba(255, 255, 255, 0.82)',
+        borderRadius: 99,
+        paddingLeft: 4,
+        paddingRight: 6,
+        paddingVertical: 4,
+        borderWidth: 1,
+        borderColor: '#fff',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.06,
+        shadowRadius: 12,
+        elevation: 3,
+    },
+    inputIconBtn: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     input: {
         flex: 1,
-        backgroundColor: '#f1f5f9',
-        borderRadius: 20,
-        paddingHorizontal: 16,
+        fontSize: 15,
+        color: '#0e1b0e',
         paddingVertical: 10,
-        maxHeight: 100,
-        fontSize: 16,
-        color: '#1a2e1a',
+        maxHeight: 80,
     },
-    sendButton: {
-        marginLeft: 12,
-        width: 44,
-        height: 44,
-        borderRadius: 22,
+    inputRightGroup: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
+    },
+    sendBtn: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
         backgroundColor: '#36e236',
         alignItems: 'center',
         justifyContent: 'center',
+        shadowColor: '#36e236',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.35,
+        shadowRadius: 6,
+        elevation: 3,
     },
-    disabledSend: {
-        backgroundColor: '#e2e8f0',
+    sendBtnDimmed: {
+        backgroundColor: '#d1fae5',
+        shadowOpacity: 0,
+        elevation: 0,
     },
-    sendButtonText: {
-        color: 'white',
-        fontSize: 20,
-        fontWeight: 'bold',
+
+    // ── Dropdown menu ──
+    menuOverlay: {
+        flex: 1,
+        backgroundColor: 'transparent',
+    },
+    menuCard: {
+        position: 'absolute',
+        top: 80,
+        right: 20,
+        backgroundColor: '#fff',
+        borderRadius: 14,
+        paddingVertical: 6,
+        minWidth: 170,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.12,
+        shadowRadius: 16,
+        elevation: 8,
+        borderWidth: 1,
+        borderColor: 'rgba(0,0,0,0.05)',
+    },
+    menuItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 13,
+        paddingHorizontal: 16,
+        gap: 10,
+    },
+    menuItemTextDanger: {
+        fontSize: 15,
+        fontWeight: '600',
+        color: '#ef4444',
     },
 });
 
