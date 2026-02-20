@@ -1,171 +1,231 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 
-const DailySummaryCard = ({ memory }) => {
+// Emotion → icon + color mapping
+const EMOTION_CONFIG = {
+    happy: { icon: 'sentiment-very-satisfied', color: '#22c55e' },
+    calm: { icon: 'spa', color: '#10b981' },
+    anxious: { icon: 'sentiment-dissatisfied', color: '#f59e0b' },
+    sad: { icon: 'sentiment-very-dissatisfied', color: '#6366f1' },
+    angry: { icon: 'mood-bad', color: '#ef4444' },
+    excited: { icon: 'sentiment-satisfied', color: '#ec4899' },
+    grateful: { icon: 'favorite', color: '#36e236' },
+    neutral: { icon: 'sentiment-neutral', color: '#94a3b8' },
+};
+
+const getMoodColor = (score) => {
+    if (score >= 8) return '#22c55e';
+    if (score >= 5) return '#f59e0b';
+    return '#ef4444';
+};
+
+const DailySummaryCard = ({ memory, style }) => {
+    // Empty state — small quiet placeholder
     if (!memory) {
         return (
-            <View style={styles.card}>
-                <Text style={styles.emptyText}>Your daily reflection will appear here after your interactions.</Text>
+            <View style={[styles.card, styles.emptyCard, style]}>
+                <MaterialIcons name="auto-awesome" size={16} color="#36e236" />
+                <Text style={styles.emptyText}>Your daily AI reflection will appear here</Text>
             </View>
         );
     }
 
     const { summary, dominantEmotion, averageMoodScore, tags, keyStressors, date } = memory;
-    const formattedDate = new Date(date).toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' });
+    const formattedDate = new Date(date).toLocaleDateString(undefined, {
+        weekday: 'short', month: 'short', day: 'numeric'
+    });
+
+    const emotion = (dominantEmotion || 'neutral').toLowerCase();
+    const config = EMOTION_CONFIG[emotion] || EMOTION_CONFIG.neutral;
+    const moodColor = getMoodColor(averageMoodScore ?? 5);
 
     return (
-        <View style={styles.container}>
-            <View style={styles.header}>
-                <Text style={styles.date}>{formattedDate}</Text>
-                <View style={[styles.moodBadge, { backgroundColor: getMoodColor(averageMoodScore) }]}>
-                    <Text style={styles.moodText}>{dominantEmotion}</Text>
+        <View style={[styles.card, style]}>
+            {/* Decorative icon watermark */}
+            <View style={styles.watermark} pointerEvents="none">
+                <MaterialIcons name="auto-awesome" size={64} color="#36e236" style={{ opacity: 0.08 }} />
+            </View>
+
+            {/* ── Top row: AI Insight label + date ── */}
+            <View style={styles.topRow}>
+                <View style={styles.labelRow}>
+                    <MaterialIcons name="auto-awesome" size={14} color="#36e236" />
+                    <Text style={styles.insightLabel}>AI Insight</Text>
+                </View>
+                <Text style={styles.dateText}>{formattedDate}</Text>
+            </View>
+
+            {/* ── Middle row: emotion pill + score + summary ── */}
+            <View style={styles.midRow}>
+                {/* Emotion icon bubble */}
+                <View style={[styles.emotionBubble, { backgroundColor: config.color + '22' }]}>
+                    <MaterialIcons name={config.icon} size={22} color={config.color} />
+                </View>
+
+                {/* Text content */}
+                <View style={styles.textBlock}>
+                    {/* Emotion + score on one line */}
+                    <View style={styles.emotionRow}>
+                        <Text style={[styles.emotionName, { color: config.color }]}>
+                            {dominantEmotion ? dominantEmotion.charAt(0).toUpperCase() + dominantEmotion.slice(1) : 'Neutral'}
+                        </Text>
+                        <View style={[styles.scorePill, { backgroundColor: moodColor + '22', borderColor: moodColor + '44' }]}>
+                            <Text style={[styles.scoreText, { color: moodColor }]}>{averageMoodScore ?? '—'}/10</Text>
+                        </View>
+                    </View>
+
+                    {/* Summary — max 2 lines */}
+                    {summary ? (
+                        <Text style={styles.summary} numberOfLines={2} ellipsizeMode="tail">
+                            {summary}
+                        </Text>
+                    ) : null}
                 </View>
             </View>
 
-            <View style={styles.scoreContainer}>
-                <Text style={styles.scoreLabel}>Mood Score</Text>
-                <View style={styles.scoreBarBackground}>
-                    <View style={[styles.scoreBarFill, { width: `${(averageMoodScore / 10) * 100}%`, backgroundColor: getMoodColor(averageMoodScore) }]} />
-                </View>
-            </View>
-
-            <Text style={styles.summary}>{summary}</Text>
-
-            {tags && tags.length > 0 && (
-                <View style={styles.tagsContainer}>
-                    {tags.map((tag, index) => (
-                        <View key={index} style={styles.tag}>
+            {/* ── Bottom row: tags + stressors ── */}
+            {((tags && tags.length > 0) || (keyStressors && keyStressors.length > 0)) && (
+                <View style={styles.bottomRow}>
+                    {tags && tags.slice(0, 3).map((tag, i) => (
+                        <View key={i} style={styles.tag}>
                             <Text style={styles.tagText}>#{tag}</Text>
                         </View>
                     ))}
-                </View>
-            )}
-
-            {keyStressors && keyStressors.length > 0 && (
-                <View style={styles.stressorsContainer}>
-                    <Text style={styles.stressorLabel}>Stressors:</Text>
-                    <Text style={styles.stressorText}>{keyStressors.join(', ')}</Text>
+                    {keyStressors && keyStressors.length > 0 && (
+                        <Text style={styles.stressorText} numberOfLines={1}>
+                            · {keyStressors.slice(0, 2).join(', ')}
+                        </Text>
+                    )}
                 </View>
             )}
         </View>
     );
 };
 
-// Helper for soft mood colors
-const getMoodColor = (score) => {
-    if (score >= 8) return '#86efac'; // Green-300
-    if (score >= 5) return '#fde047'; // Yellow-300
-    return '#fda4af'; // Rose-300
-};
-
 const styles = StyleSheet.create({
-    container: {
-        backgroundColor: 'rgba(255, 255, 255, 0.7)', // Glassmorphism-ish
-        borderRadius: 24,
-        padding: 20,
-        marginBottom: 16,
-        borderWidth: 1,
-        borderColor: 'rgba(255, 255, 255, 0.8)',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 8,
-        elevation: 2,
-    },
     card: {
-        padding: 24,
+        backgroundColor: 'rgba(54, 226, 54, 0.07)',
+        borderWidth: 1,
+        borderColor: 'rgba(54, 226, 54, 0.18)',
+        borderRadius: 18,
+        padding: 14,
+        overflow: 'hidden',
+        position: 'relative',
+    },
+    emptyCard: {
+        flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: 'rgba(255, 255, 255, 0.4)',
-        borderRadius: 24,
-        marginBottom: 16,
-        height: 120,
+        gap: 8,
+        paddingVertical: 12,
     },
     emptyText: {
+        fontSize: 13,
         color: '#64748b',
         fontStyle: 'italic',
-        textAlign: 'center',
     },
-    header: {
+    watermark: {
+        position: 'absolute',
+        right: -8,
+        top: -8,
+    },
+
+    // Top row
+    topRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 16,
+        marginBottom: 10,
     },
-    date: {
-        fontSize: 14,
+    labelRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 5,
+    },
+    insightLabel: {
+        fontSize: 12,
+        fontWeight: '700',
+        color: '#1a7a1a',
+        letterSpacing: 0.3,
+    },
+    dateText: {
+        fontSize: 10,
         fontWeight: '600',
-        color: '#64748b',
-        textTransform: 'uppercase',
-        letterSpacing: 0.5,
-    },
-    moodBadge: {
-        paddingHorizontal: 12,
-        paddingVertical: 4,
-        borderRadius: 12,
-    },
-    moodText: {
-        fontSize: 12,
-        fontWeight: 'bold',
-        color: '#1a2e1a', // Dark text for contrast
-        textTransform: 'capitalize',
-    },
-    scoreContainer: {
-        marginBottom: 16,
-    },
-    scoreLabel: {
-        fontSize: 12,
         color: '#94a3b8',
-        marginBottom: 6,
+        textTransform: 'uppercase',
+        letterSpacing: 0.8,
     },
-    scoreBarBackground: {
-        height: 6,
-        backgroundColor: '#e2e8f0',
-        borderRadius: 3,
-        overflow: 'hidden',
+
+    // Mid row
+    midRow: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        gap: 12,
     },
-    scoreBarFill: {
-        height: '100%',
-        borderRadius: 3,
+    emotionBubble: {
+        width: 44,
+        height: 44,
+        borderRadius: 12,
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexShrink: 0,
+    },
+    textBlock: {
+        flex: 1,
+        gap: 4,
+    },
+    emotionRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+    },
+    emotionName: {
+        fontSize: 14,
+        fontWeight: '700',
+    },
+    scorePill: {
+        paddingHorizontal: 8,
+        paddingVertical: 2,
+        borderRadius: 99,
+        borderWidth: 1,
+    },
+    scoreText: {
+        fontSize: 11,
+        fontWeight: '700',
     },
     summary: {
-        fontSize: 16,
-        lineHeight: 24,
-        color: '#334155',
-        marginBottom: 16,
+        fontSize: 13,
+        lineHeight: 19,
+        color: '#374151',
     },
-    tagsContainer: {
+
+    // Bottom row — tags + stressors inline
+    bottomRow: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        gap: 8,
-        marginBottom: 12,
+        alignItems: 'center',
+        gap: 6,
+        marginTop: 10,
+        paddingTop: 10,
+        borderTopWidth: 1,
+        borderTopColor: 'rgba(54, 226, 54, 0.12)',
     },
     tag: {
-        backgroundColor: '#f1f5f9',
-        paddingHorizontal: 10,
-        paddingVertical: 4,
-        borderRadius: 8,
+        backgroundColor: 'rgba(54, 226, 54, 0.12)',
+        paddingHorizontal: 9,
+        paddingVertical: 3,
+        borderRadius: 99,
     },
     tagText: {
-        fontSize: 12,
-        color: '#475569',
-    },
-    stressorsContainer: {
-        marginTop: 8,
-        paddingTop: 12,
-        borderTopWidth: 1,
-        borderTopColor: '#f1f5f9',
-    },
-    stressorLabel: {
-        fontSize: 12,
+        fontSize: 11,
         fontWeight: '600',
-        color: '#94a3b8',
-        marginBottom: 4,
+        color: '#166534',
     },
     stressorText: {
-        fontSize: 14,
-        color: '#64748b',
-    }
+        fontSize: 11,
+        color: '#94a3b8',
+        flexShrink: 1,
+    },
 });
 
 export default DailySummaryCard;
