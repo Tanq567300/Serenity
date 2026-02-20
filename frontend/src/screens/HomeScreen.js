@@ -1,138 +1,194 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, RefreshControl, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import Svg, { Circle } from 'react-native-svg';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import useAuthStore from '../stores/authStore';
+import { getDashboardData } from '../services/dashboardApi';
+import ScreenBackground from '../components/ScreenBackground';
 
 const HomeScreen = () => {
     const navigation = useNavigation();
     const { user } = useAuthStore();
-    const userName = user?.name || 'Abhinav'; // Placeholder if name missing
+    const [dashboardData, setDashboardData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
+
+    const fetchData = async () => {
+        try {
+            const data = await getDashboardData();
+            setDashboardData(data);
+        } catch (error) {
+            console.error('Failed to load dashboard:', error);
+        } finally {
+            setLoading(false);
+            setRefreshing(false);
+        }
+    };
+
+    useFocusEffect(
+        useCallback(() => {
+            fetchData();
+        }, [])
+    );
+
+    const onRefresh = () => {
+        setRefreshing(true);
+        fetchData();
+    };
+
+    if (loading) {
+        return (
+            <View style={[styles.container, styles.center]}>
+                <ActivityIndicator size="large" color="#36e236" />
+            </View>
+        );
+    }
+
+    const userName = dashboardData?.userName || user?.name || 'Friend';
+    const moodScore = dashboardData?.moodScore || 0;
+    const quote = dashboardData?.quote || "Breathe. You're doing great.";
+    const recentJournals = dashboardData?.recentJournals || [];
+    const aiGuideMessage = dashboardData?.aiGuideMessage || `How are you feeling right now, ${userName}?`;
+
+    // Mood ring calculations
+    const radius = 45;
+    const circumference = 2 * Math.PI * radius;
+    const progress = moodScore / 10;
+    const strokeDashoffset = circumference - (progress * circumference);
 
     return (
         <SafeAreaView style={styles.container}>
-            <ScrollView contentContainerStyle={styles.scrollContent}>
+            <ScreenBackground variant="default" />
+            <ScrollView
+                contentContainerStyle={styles.scrollContent}
+                refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#36e236']} />}
+            >
                 {/* Top Bar */}
                 <View style={styles.header}>
                     <View>
                         <Text style={styles.brandText}>SERENITY</Text>
                         <Text style={styles.greetingText}>Good Morning, {userName}</Text>
                     </View>
-                    <View style={styles.profileImageContainer}>
-                        {/* Placeholder Image */}
-                        <Image
-                            source={{ uri: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDFWDxMWy5qHcRG6uajml4aSDOHROvpkpuQxlscGWLee5MCYFoSHdSno2yBtF570LevKt-jwQjdiitiTO_INS18kwJ6z0bIHttf8AiHc4NFniaFHzpsEBelhr21JUomsi8m8Fm6n9z7v6-5j5A7uf5H73uUDtMfuJdouO_L1N_7It7ZS__A9vPedXEQIWUD7O09nNWUBbOSbJvA2YiSr-8rD-KvU1_XhaIUXdAqGnV0BAmwpYp8x3QMhMRQVDXv7DjnBXlbcSrNxW6b' }}
-                            style={styles.profileImage}
-                        />
-                    </View>
+                    <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
+                        <View style={styles.profileImageContainer}>
+                            <Image
+                                source={{ uri: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDFWDxMWy5qHcRG6uajml4aSDOHROvpkpuQxlscGWLee5MCYFoSHdSno2yBtF570LevKt-jwQjdiitiTO_INS18kwJ6z0bIHttf8AiHc4NFniaFHzpsEBelhr21JUomsi8m8Fm6n9z7v6-5j5A7uf5H73uUDtMfuJdouO_L1N_7It7ZS__A9vPedXEQIWUD7O09nNWUBbOSbJvA2YiSr-8rD-KvU1_XhaIUXdAqGnV0BAmwpYp8x3QMhMRQVDXv7DjnBXlbcSrNxW6b' }}
+                                style={styles.profileImage}
+                            />
+                        </View>
+                    </TouchableOpacity>
                 </View>
 
                 {/* Mood Score Section */}
                 <View style={styles.moodSection}>
                     <View style={styles.moodRingContainer}>
                         <Svg height="250" width="250" viewBox="0 0 100 100" style={{ transform: [{ rotate: '-90deg' }] }}>
-                            <Circle cx="50" cy="50" r="45" stroke="#e8f3e8" strokeWidth="4" fill="none" />
+                            <Circle cx="50" cy="50" r={radius} stroke="#e8f3e8" strokeWidth="4" fill="none" />
                             <Circle
-                                cx="50" cy="50" r="45"
+                                cx="50" cy="50" r={radius}
                                 stroke="#36e236"
                                 strokeWidth="4"
                                 fill="none"
-                                strokeDasharray="282.7"
-                                strokeDashoffset="62.2" // 78% roughly
+                                strokeDasharray={circumference}
+                                strokeDashoffset={strokeDashoffset}
                                 strokeLinecap="round"
                             />
                         </Svg>
                         <View style={styles.moodTextContainer}>
-                            <Text style={styles.moodScore}>78</Text>
+                            <Text style={styles.moodScore}>{moodScore > 0 ? moodScore : '-'}</Text>
                             <Text style={styles.moodLabel}>MOOD SCORE</Text>
                         </View>
-                        {/* Soft Glow mimicking CSS blur - simplified for RN */}
                         <View style={styles.glowEffect} />
                     </View>
-                    <Text style={styles.quoteText}>
-                        "You're doing great today. Your mindfulness is paying off."
-                    </Text>
+                    <Text style={styles.quoteText}>"{quote}"</Text>
                 </View>
 
-                {/* AI Guide Section */}
-                <View style={styles.aiGuideContainer}>
+                {/* AI Guide Section — tap anywhere to open chat */}
+                <TouchableOpacity style={styles.aiGuideContainer} onPress={() => navigation.navigate('Chat')} activeOpacity={0.85}>
                     <View style={styles.aiGuideContent}>
                         <View style={styles.aiIconContainer}>
                             <MaterialIcons name="auto-awesome" size={24} color="#fff" />
                         </View>
                         <View style={{ flex: 1 }}>
-                            <Text style={styles.aiGuideTitle}>Always-On AI Guide</Text>
-                            <Text style={styles.aiGuideQuestion}>How are you feeling right now, {userName}?</Text>
+                            <Text style={styles.aiGuideTitle}>Always-On AI Guide  →</Text>
+                            <Text style={styles.aiGuideQuestion}>{aiGuideMessage}</Text>
                         </View>
                     </View>
                     <View style={styles.quickActions}>
-                        <TouchableOpacity style={styles.quickActionButton} onPress={() => navigation.navigate('Chat', { initialMessage: "I'm feeling calm" })}>
-                            <Text style={styles.quickActionText}>I'm feeling calm</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.quickActionButton} onPress={() => navigation.navigate('Chat', { initialMessage: "A bit anxious" })}>
-                            <Text style={styles.quickActionText}>A bit anxious</Text>
-                        </TouchableOpacity>
+                        {moodScore < 4 ? (
+                            <>
+                                <TouchableOpacity style={styles.quickActionButton} onPress={() => navigation.navigate('Chat', { initialMessage: "I need support" })}>
+                                    <Text style={styles.quickActionText}>I need support</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.quickActionButton} onPress={() => navigation.navigate('Chat', { initialMessage: "Help me relax" })}>
+                                    <Text style={styles.quickActionText}>Help me relax</Text>
+                                </TouchableOpacity>
+                            </>
+                        ) : moodScore > 7 ? (
+                            <>
+                                <TouchableOpacity style={styles.quickActionButton} onPress={() => navigation.navigate('Chat', { initialMessage: "I'm feeling great today!" })}>
+                                    <Text style={styles.quickActionText}>I'm great today!</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.quickActionButton} onPress={() => navigation.navigate('Chat', { initialMessage: "What can I do to stay positive?" })}>
+                                    <Text style={styles.quickActionText}>Stay positive</Text>
+                                </TouchableOpacity>
+                            </>
+                        ) : (
+                            <>
+                                <TouchableOpacity style={styles.quickActionButton} onPress={() => navigation.navigate('Chat', { initialMessage: "I'm feeling calm" })}>
+                                    <Text style={styles.quickActionText}>I'm feeling calm</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.quickActionButton} onPress={() => navigation.navigate('Chat', { initialMessage: "A bit anxious" })}>
+                                    <Text style={styles.quickActionText}>A bit anxious</Text>
+                                </TouchableOpacity>
+                            </>
+                        )}
                     </View>
-                </View>
+                </TouchableOpacity>
 
                 {/* Mood Journal Section */}
                 <View style={styles.journalSection}>
                     <View style={styles.sectionHeader}>
-                        <Text style={styles.sectionTitle}>Mood Journal</Text>
+                        <Text style={styles.sectionTitle}>Recent Journal</Text>
                         <TouchableOpacity onPress={() => navigation.navigate('Journal')}>
                             <Text style={styles.viewAllText}>VIEW ALL</Text>
                         </TouchableOpacity>
                     </View>
 
-                    {/* Journal Card 1 */}
-                    <View style={styles.journalCard}>
-                        <View style={[styles.journalIconContainer, { backgroundColor: '#f3e8f3' }]}>
-                            <MaterialIcons name="wb-twilight" size={24} color="#907090" />
-                        </View>
-                        <View style={styles.journalContent}>
-                            <View style={styles.journalHeader}>
-                                <Text style={styles.journalTitle}>Morning Reflection</Text>
-                                <Text style={styles.journalTime}>08:30 AM</Text>
+                    {recentJournals.length > 0 ? (
+                        recentJournals.map((journal) => (
+                            <View key={journal.id} style={styles.journalCard}>
+                                <View style={[styles.journalIconContainer, { backgroundColor: '#e8f3e8' }]}>
+                                    <MaterialIcons name="article" size={24} color="#509550" />
+                                </View>
+                                <View style={styles.journalContent}>
+                                    <View style={styles.journalHeader}>
+                                        <Text style={styles.journalTitle}>
+                                            {journal.dominantEmotion ? journal.dominantEmotion.charAt(0).toUpperCase() + journal.dominantEmotion.slice(1) : 'Daily Entry'}
+                                        </Text>
+                                        <Text style={styles.journalTime}>
+                                            {new Date(journal.date).toLocaleDateString()}
+                                        </Text>
+                                    </View>
+                                    <Text style={styles.journalPreview} numberOfLines={1}>
+                                        {journal.summary}
+                                    </Text>
+                                </View>
                             </View>
-                            <Text style={styles.journalPreview} numberOfLines={1}>
-                                Calm and focused today...
-                            </Text>
-                        </View>
-                    </View>
-
-                    {/* Journal Card 2 */}
-                    <View style={styles.journalCard}>
-                        <View style={[styles.journalIconContainer, { backgroundColor: '#e8f3e8' }]}>
-                            <MaterialIcons name="favorite" size={24} color="#509550" />
-                        </View>
-                        <View style={styles.journalContent}>
-                            <View style={styles.journalHeader}>
-                                <Text style={styles.journalTitle}>Gratitude List</Text>
-                                <Text style={styles.journalTime}>Yesterday</Text>
-                            </View>
-                            <Text style={styles.journalPreview} numberOfLines={1}>
-                                I am thankful for the morning sun...
-                            </Text>
-                        </View>
-                    </View>
+                        ))
+                    ) : (
+                        <Text style={styles.noDataText}>No entries yet. Start chatting!</Text>
+                    )}
 
                     {/* Add New Entry Prompt */}
-                    <TouchableOpacity style={styles.addEntryCard} onPress={() => navigation.navigate('Chat')}>
-                        <MaterialIcons name="add-circle-outline" size={32} color="#509550" style={{ opacity: 0.6 }} />
-                        <Text style={styles.addEntryText}>ADD NEW JOURNAL ENTRY</Text>
+                    <TouchableOpacity style={styles.addEntryCard} onPress={() => navigation.navigate('Journal')}>
+                        <MaterialIcons name="edit" size={32} color="#509550" style={{ opacity: 0.6 }} />
+                        <Text style={styles.addEntryText}>WRITE A JOURNAL ENTRY</Text>
                     </TouchableOpacity>
                 </View>
             </ScrollView>
-
-            {/* Floating Chat Button */}
-            <TouchableOpacity
-                style={styles.fab}
-                onPress={() => navigation.navigate('Chat')}
-            >
-                <MaterialIcons name="chat-bubble" size={24} color="#fff" />
-            </TouchableOpacity>
         </SafeAreaView>
     );
 };
@@ -140,7 +196,7 @@ const HomeScreen = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fbfcfb', // background-light
+        backgroundColor: 'transparent', // ScreenBackground handles the bg
     },
     scrollContent: {
         paddingBottom: 100, // Space for Bottom Tab
@@ -394,6 +450,15 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.4,
         shadowRadius: 8,
         elevation: 8,
+    },
+    center: {
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    noDataText: {
+        color: '#94a3b8',
+        fontStyle: 'italic',
+        marginBottom: 16,
     },
 });
 
