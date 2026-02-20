@@ -76,7 +76,18 @@ const useChatStore = create((set, get) => ({
     // Generic add message (if needed for restoring history)
     setMessages: (history) => {
         set({ messages: history });
-    }
+    },
+
+    // Clear chat — start a brand new session
+    clearChat: async () => {
+        set({ messages: [], isCrisis: false, error: null, isTyping: true });
+        try {
+            const data = await startSession();
+            set({ sessionId: data.sessionId, isTyping: false });
+        } catch (err) {
+            set({ error: err.message || 'Failed to clear chat', isTyping: false });
+        }
+    },
 }));
 
 export default useChatStore;
