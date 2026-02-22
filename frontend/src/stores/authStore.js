@@ -29,14 +29,16 @@ const useAuthStore = create((set, get) => ({
         set({ isLoading: true, error: null });
         try {
             const data = await login(email, password);
-            const { accessToken, user } = data;
+            const { accessToken, refreshToken, user } = data;
 
             await SecureStore.setItemAsync('accessToken', accessToken);
-            // Store refresh token if applicable
+            if (refreshToken) {
+                await SecureStore.setItemAsync('refreshToken', refreshToken);
+            }
 
             set({
                 token: accessToken,
-                user: user, // If backend returns user object
+                user: user,
                 isAuthenticated: true,
                 isLoading: false
             });
@@ -69,6 +71,7 @@ const useAuthStore = create((set, get) => ({
 
     logout: async () => {
         await SecureStore.deleteItemAsync('accessToken');
+        await SecureStore.deleteItemAsync('refreshToken');
         set({
             user: null,
             token: null,

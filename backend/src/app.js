@@ -35,6 +35,7 @@ app.use(limiter);
 const chatRoutes = require('./routes/chat.routes');
 const dailyMemoryRoutes = require('./routes/dailyMemory.routes');
 const patternMemoryRoutes = require('./routes/patternMemory.routes');
+const articleRoutes = require('./routes/article.routes');
 
 // Routes
 app.use('/api/health', healthRoutes);
@@ -43,6 +44,7 @@ app.use('/api/chat', chatRoutes);
 app.use('/api/memory/pattern', patternMemoryRoutes); // Distinct path
 app.use('/api/memory', dailyMemoryRoutes);
 app.use('/api/dashboard', require('./routes/dashboard.routes'));
+app.use('/api/articles', articleRoutes);
 app.use('/api/mood', (req, res, next) => {
     res.status(501).json({ message: "Not Implemented" });
 });

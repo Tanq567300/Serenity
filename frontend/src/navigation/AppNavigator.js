@@ -6,6 +6,7 @@ import useAuthStore from '../stores/authStore';
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import ChatScreen from '../screens/ChatScreen';
+import ArticleDetailScreen from '../screens/ArticleDetailScreen';
 import MainTabNavigator from './MainTabNavigator';
 
 const Stack = createNativeStackNavigator();
@@ -39,6 +40,13 @@ const AppNavigator = () => {
                             options={{
                                 animation: 'slide_from_bottom', // Nice transition for modal-like feel
                                 presentation: 'card',
+                            }}
+                        />
+                        <Stack.Screen
+                            name="ArticleDetail"
+                            component={ArticleDetailScreen}
+                            options={{
+                                animation: 'slide_from_right',
                             }}
                         />
                     </>

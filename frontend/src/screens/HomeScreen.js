@@ -7,15 +7,20 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import useAuthStore from '../stores/authStore';
 import { getDashboardData } from '../services/dashboardApi';
 import ScreenBackground from '../components/ScreenBackground';
+import ArticleCard from '../components/ArticleCard';
+import { getPersonalizedArticles } from '../services/articlesApi';
 
 const HomeScreen = () => {
     const navigation = useNavigation();
     const { user } = useAuthStore();
     const [dashboardData, setDashboardData] = useState(null);
+    const [articles, setArticles] = useState([]);
+    const [articlesLoading, setArticlesLoading] = useState(true);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
 
-    const fetchData = async () => {
+    // Fetch dashboard data — runs on every screen focus
+    const fetchDashboard = async (isRefreshing = false) => {
         try {
             const data = await getDashboardData();
             setDashboardData(data);
@@ -23,19 +28,39 @@ const HomeScreen = () => {
             console.error('Failed to load dashboard:', error);
         } finally {
             setLoading(false);
-            setRefreshing(false);
+            if (isRefreshing) setRefreshing(false);
         }
     };
 
+    // Fetch articles — only on first load or manual pull-to-refresh
+    const fetchArticles = async () => {
+        try {
+            setArticlesLoading(true);
+            const result = await getPersonalizedArticles();
+            setArticles(result.articles || []);
+        } catch (error) {
+            console.error('Failed to load articles:', error);
+        } finally {
+            setArticlesLoading(false);
+        }
+    };
+
+    // On focus: only refresh dashboard, not articles
     useFocusEffect(
         useCallback(() => {
-            fetchData();
+            fetchDashboard();
         }, [])
     );
 
+    // Load articles once on mount
+    React.useEffect(() => {
+        fetchArticles();
+    }, []);
+
     const onRefresh = () => {
         setRefreshing(true);
-        fetchData();
+        fetchDashboard(true);
+        fetchArticles(); // also refresh articles on manual pull
     };
 
     if (loading) {
@@ -187,6 +212,29 @@ const HomeScreen = () => {
                         <MaterialIcons name="edit" size={32} color="#509550" style={{ opacity: 0.6 }} />
                         <Text style={styles.addEntryText}>WRITE A JOURNAL ENTRY</Text>
                     </TouchableOpacity>
+                </View>
+
+                {/* Articles Section */}
+                <View style={styles.articlesSection}>
+                    <View style={styles.sectionHeader}>
+                        <Text style={styles.sectionTitle}>Articles</Text>
+                    </View>
+                    {articlesLoading ? (
+                        <ActivityIndicator size="small" color="#36e236" style={{ marginVertical: 24 }} />
+                    ) : articles.length > 0 ? (
+                        articles.map((item, idx) => (
+                            <ArticleCard
+                                key={item.id}
+                                title={item.title}
+                                description={item.description}
+                                source={item.source}
+                                index={idx}
+                                onPress={() => navigation.navigate('ArticleDetail', { article: item })}
+                            />
+                        ))
+                    ) : (
+                        <Text style={styles.noDataText}>Could not load articles. Check your connection.</Text>
+                    )}
                 </View>
             </ScrollView>
         </SafeAreaView>
@@ -459,6 +507,10 @@ const styles = StyleSheet.create({
         color: '#94a3b8',
         fontStyle: 'italic',
         marginBottom: 16,
+    },
+    articlesSection: {
+        paddingHorizontal: 24,
+        marginBottom: 24,
     },
 });
 
