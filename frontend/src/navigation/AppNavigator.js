@@ -7,6 +7,7 @@ import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import ChatScreen from '../screens/ChatScreen';
 import ArticleDetailScreen from '../screens/ArticleDetailScreen';
+import BreathingExerciseScreen from '../screens/BreathingExerciseScreen';
 import MainTabNavigator from './MainTabNavigator';
 
 const Stack = createNativeStackNavigator();
@@ -45,6 +46,13 @@ const AppNavigator = () => {
                         <Stack.Screen
                             name="ArticleDetail"
                             component={ArticleDetailScreen}
+                            options={{
+                                animation: 'slide_from_right',
+                            }}
+                        />
+                        <Stack.Screen
+                            name="BreathingExercise"
+                            component={BreathingExerciseScreen}
                             options={{
                                 animation: 'slide_from_right',
                             }}
