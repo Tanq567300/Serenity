@@ -10,8 +10,10 @@ import DominantEmotionCard from '../components/DominantEmotionCard';
 import RecurringTagsCard from '../components/RecurringTagsCard';
 import DailySummaryCard from '../components/DailySummaryCard';
 import ScreenBackground from '../components/ScreenBackground';
+import { useNavigation } from '@react-navigation/native';
 
 const PatternDashboardScreen = () => {
+    const navigation = useNavigation();
     const [pattern, setPattern] = useState(null);
     const [patternLoading, setPatternLoading] = useState(true);
     const [dailyMemory, setDailyMemory] = useState(null);
@@ -135,6 +137,29 @@ const PatternDashboardScreen = () => {
                         <Text style={styles.milestoneHint}>Unlock deeper insights as you journal more</Text>
                     </View>
                 )}
+
+                {/* ── Guided Breathing Exercise ── */}
+                <View style={[styles.sectionHeader, { marginTop: 24 }]}>
+                    <Text style={styles.sectionTitle}>MINDFUL RESET</Text>
+                </View>
+
+                <View style={styles.breathingCard}>
+                    <View style={styles.breathingIconBadge}>
+                        <MaterialIcons name="air" size={24} color="#fff" />
+                    </View>
+                    <Text style={styles.breathingTitle}>Guided Breathing Exercise</Text>
+                    <Text style={styles.breathingSubtitle}>
+                        Take 2 minutes to reset with a 4-4-4 breathing cycle.
+                    </Text>
+                    <TouchableOpacity
+                        style={styles.breathingBtn}
+                        onPress={() => navigation.navigate('BreathingExercise')}
+                        activeOpacity={0.85}
+                    >
+                        <Text style={styles.breathingBtnText}>Start Breathing</Text>
+                    </TouchableOpacity>
+                </View>
+
             </ScrollView>
         </SafeAreaView>
     );
@@ -181,6 +206,63 @@ const styles = StyleSheet.create({
     milestoneNum: { fontSize: 13, fontWeight: 'bold', color: '#36e236' },
     milestoneLabel: { fontSize: 8, color: '#94a3b8' },
     milestoneHint: { fontSize: 11, color: '#94a3b8' },
+    breathingCard: {
+        backgroundColor: '#fff',
+        borderRadius: 20,
+        padding: 24,
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#f1f5f9',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.04,
+        shadowRadius: 6,
+        elevation: 2,
+    },
+    breathingIconBadge: {
+        width: 52,
+        height: 52,
+        borderRadius: 26,
+        backgroundColor: '#36e236',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: 14,
+        shadowColor: '#36e236',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 4,
+    },
+    breathingTitle: {
+        fontSize: 17,
+        fontWeight: 'bold',
+        color: '#1a2e1a',
+        marginBottom: 6,
+        textAlign: 'center',
+    },
+    breathingSubtitle: {
+        fontSize: 13,
+        color: '#64748b',
+        textAlign: 'center',
+        lineHeight: 20,
+        marginBottom: 20,
+    },
+    breathingBtn: {
+        backgroundColor: '#36e236',
+        paddingVertical: 13,
+        paddingHorizontal: 36,
+        borderRadius: 12,
+        shadowColor: '#36e236',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 4,
+    },
+    breathingBtnText: {
+        fontSize: 15,
+        fontWeight: '600',
+        color: '#0e1b0e',
+    },
 });
 
 export default PatternDashboardScreen;
