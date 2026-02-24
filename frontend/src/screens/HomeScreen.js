@@ -4,10 +4,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import Svg, { Circle } from 'react-native-svg';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import * as SecureStore from 'expo-secure-store';
 import useAuthStore from '../stores/authStore';
 import { getDashboardData } from '../services/dashboardApi';
 import ScreenBackground from '../components/ScreenBackground';
 import ArticleCard from '../components/ArticleCard';
+import BreathingSuggestionCard from '../components/BreathingSuggestionCard';
 import { getPersonalizedArticles } from '../services/articlesApi';
 
 const HomeScreen = () => {
@@ -18,6 +20,7 @@ const HomeScreen = () => {
     const [articlesLoading, setArticlesLoading] = useState(true);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
+    const [dismissedToday, setDismissedToday] = useState(false);
 
     // Fetch dashboard data — runs on every screen focus
     const fetchDashboard = async (isRefreshing = false) => {
@@ -45,10 +48,22 @@ const HomeScreen = () => {
         }
     };
 
-    // On focus: only refresh dashboard, not articles
+    // On focus: refresh dashboard + recheck dismissal state
     useFocusEffect(
         useCallback(() => {
             fetchDashboard();
+
+            const checkDismissal = async () => {
+                try {
+                    const stored = await SecureStore.getItemAsync('breathingSuggestionDismissedDate');
+                    const today = new Date().toDateString();
+                    setDismissedToday(stored === today);
+                } catch (_) {
+                    // Storage read failure — default to showing the card
+                    setDismissedToday(false);
+                }
+            };
+            checkDismissal();
         }, [])
     );
 
@@ -76,6 +91,23 @@ const HomeScreen = () => {
     const quote = dashboardData?.quote || "Breathe. You're doing great.";
     const recentJournals = dashboardData?.recentJournals || [];
     const aiGuideMessage = dashboardData?.aiGuideMessage || `How are you feeling right now, ${userName}?`;
+
+    // Intervention selector — extend here for future suggestion types
+    const interventionType = (() => {
+        if (moodScore > 0 && moodScore < 4) return 'breathing';
+        // if (stressTrendHigh) return 'meditation';
+        // if (anxietyPatternDetected) return 'grounding';
+        return null;
+    })();
+
+    const handleDismissBreathing = async () => {
+        setDismissedToday(true);
+        try {
+            await SecureStore.setItemAsync('breathingSuggestionDismissedDate', new Date().toDateString());
+        } catch (_) {
+            // Storage write failure — card is hidden for session via state regardless
+        }
+    };
 
     // Mood ring calculations
     const radius = 45;
@@ -172,6 +204,17 @@ const HomeScreen = () => {
                         )}
                     </View>
                 </TouchableOpacity>
+
+                {/* Breathing Suggestion Card */}
+                {interventionType === 'breathing' && !dismissedToday && (
+                    <BreathingSuggestionCard
+                        onStart={() => {
+                            handleDismissBreathing();
+                            navigation.navigate('BreathingExercise');
+                        }}
+                        onDismiss={handleDismissBreathing}
+                    />
+                )}
 
                 {/* Mood Journal Section */}
                 <View style={styles.journalSection}>
