@@ -1,5 +1,6 @@
 const MoodEntry = require('../models/MoodEntry');
 const { analyzeJournalEntry } = require('../services/journalTaggingService');
+const { createDailyMemory } = require('../services/dailyMemoryService');
 const { encrypt } = require('../utils/encryption');
 
 /**
@@ -37,6 +38,10 @@ exports.submitJournal = async (req, res) => {
         });
 
         await newEntry.save();
+
+        // 4. Update DailyMemory Pipeline
+        // Trigger aggregation so the user's new journal immediately reflects in the dashboard list
+        await createDailyMemory(userId, new Date(), true);
 
         return res.status(201).json({
             success: true,
