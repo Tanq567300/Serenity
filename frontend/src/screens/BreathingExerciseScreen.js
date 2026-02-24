@@ -54,19 +54,21 @@ const BreathingExerciseScreen = () => {
     // Animated value for phase-label fade transition.
     const fadeAnim = useRef(new Animated.Value(1)).current;
 
-    // Tick every second; derive phase from elapsed to avoid drift.
+    // Use wall-clock time as the single source of truth to prevent drift.
     useEffect(() => {
+        const startTime = Date.now();
+
         const interval = setInterval(() => {
-            setElapsed(prev => {
-                const next = prev + 1;
-                if (next >= TOTAL_DURATION) {
-                    clearInterval(interval);
-                    setIsComplete(true);
-                    return TOTAL_DURATION;
-                }
-                return next;
-            });
-        }, 1000);
+            const secondsElapsed = Math.floor((Date.now() - startTime) / 1000);
+
+            if (secondsElapsed >= TOTAL_DURATION) {
+                setElapsed(TOTAL_DURATION);
+                setIsComplete(true);
+                clearInterval(interval);
+            } else {
+                setElapsed(secondsElapsed);
+            }
+        }, 200); // poll 5× per second for accuracy
 
         return () => clearInterval(interval);
     }, []);
@@ -85,7 +87,6 @@ const BreathingExerciseScreen = () => {
 
     const cycleNumber = Math.min(Math.floor(elapsed / CYCLE_DURATION) + 1, EXERCISE.cycles);
     const progressPercent = (elapsed / TOTAL_DURATION) * 100;
-
     return (
         <SafeAreaView style={styles.container}>
             <ScreenBackground variant="insights" />
@@ -115,7 +116,7 @@ const BreathingExerciseScreen = () => {
                 </Text>
             )}
 
-            {/* Lottie animation — loops freely, not synced to phase */}
+            {/* Lottie animation — fully synced to breathing cycle */}
             <View style={styles.animationContainer}>
                 <LottieView
                     source={require('../../assets/lottie/breathing.json')}
