@@ -9,6 +9,15 @@ const userSchema = new mongoose.Schema({
         trim: true,
         index: true,
     },
+    username: {
+        type: String,
+        required: [true, 'Username is required'],
+        trim: true,
+    },
+    profilePic: {
+        type: String,
+        default: 'https://lh3.googleusercontent.com/aida-public/AB6AXuC4l4ZP8QfEHYeysThHgKnBfRF9d7tgFOwAYcWqzWU-UVr_jfz00nS6Y0NsMoFp5y5sl5zhWUZcgG3eD1sWU1ysepDNXOF3FNyItBcBK_n4RXhEGHnldYhDFM6b09ffoW_KlqDt4JgXbkBpBSkc9hgu4dZPh2Ez5Xc3fl7t4w3xBnT6oiq5Hrof7JdcoanS3Qyb116pVR4GtUcj1F91muWP6Ypr0AL6_FKitWFfBTWuUiSFItqywaI_K3xxc1dVheQz2p82VFLDrx2n', // Default Serenity Green profile pic
+    },
     passwordHash: {
         type: String,
         required: [true, 'Password is required'],

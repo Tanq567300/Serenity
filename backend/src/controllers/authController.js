@@ -6,14 +6,14 @@ const { validateRegistration, validateLogin } = require('../utils/validators/aut
 // POST /api/auth/register
 const register = async (req, res, next) => {
     try {
-        const { email, password } = req.body;
+        const { email, password, username } = req.body;
 
         // Validate input
         const validation = validateRegistration(email, password);
-        if (!validation.isValid) {
+        if (!validation.isValid || !username || username.trim() === '') {
             return res.status(400).json({
                 success: false,
-                message: validation.errors.join(', '),
+                message: validation.isValid ? 'Username is required' : validation.errors.join(', '),
             });
         }
 
@@ -31,7 +31,7 @@ const register = async (req, res, next) => {
         const passwordHash = await bcrypt.hash(password, salt);
 
         // Create user
-        await User.create({ email, passwordHash });
+        await User.create({ email, passwordHash, username });
 
         res.status(201).json({
             success: true,
@@ -89,7 +89,9 @@ const login = async (req, res, next) => {
             user: {
                 id: user._id,
                 email: user.email,
-                username: user.username // If username exists in schema
+                username: user.username,
+                profilePic: user.profilePic,
+                createdAt: user.createdAt
             }
         });
     } catch (error) {
@@ -132,9 +134,19 @@ const refresh = async (req, res, next) => {
 // GET /api/auth/me
 const getMe = async (req, res, next) => {
     try {
+        const user = await User.findById(req.user.userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
         res.status(200).json({
             success: true,
-            userId: req.user.userId,
+            user: {
+                id: user._id,
+                email: user.email,
+                username: user.username,
+                profilePic: user.profilePic,
+                createdAt: user.createdAt
+            }
         });
     } catch (error) {
         next(error);

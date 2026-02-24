@@ -71,7 +71,7 @@ const HomeScreen = () => {
         );
     }
 
-    const userName = dashboardData?.userName || user?.name || 'Friend';
+    const userName = dashboardData?.userName || user?.username || user?.name || 'Friend';
     const moodScore = dashboardData?.moodScore || 0;
     const quote = dashboardData?.quote || "Breathe. You're doing great.";
     const recentJournals = dashboardData?.recentJournals || [];
@@ -99,7 +99,7 @@ const HomeScreen = () => {
                     <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
                         <View style={styles.profileImageContainer}>
                             <Image
-                                source={{ uri: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDFWDxMWy5qHcRG6uajml4aSDOHROvpkpuQxlscGWLee5MCYFoSHdSno2yBtF570LevKt-jwQjdiitiTO_INS18kwJ6z0bIHttf8AiHc4NFniaFHzpsEBelhr21JUomsi8m8Fm6n9z7v6-5j5A7uf5H73uUDtMfuJdouO_L1N_7It7ZS__A9vPedXEQIWUD7O09nNWUBbOSbJvA2YiSr-8rD-KvU1_XhaIUXdAqGnV0BAmwpYp8x3QMhMRQVDXv7DjnBXlbcSrNxW6b' }}
+                                source={{ uri: user?.profilePic || 'https://lh3.googleusercontent.com/aida-public/AB6AXuDFWDxMWy5qHcRG6uajml4aSDOHROvpkpuQxlscGWLee5MCYFoSHdSno2yBtF570LevKt-jwQjdiitiTO_INS18kwJ6z0bIHttf8AiHc4NFniaFHzpsEBelhr21JUomsi8m8Fm6n9z7v6-5j5A7uf5H73uUDtMfuJdouO_L1N_7It7ZS__A9vPedXEQIWUD7O09nNWUBbOSbJvA2YiSr-8rD-KvU1_XhaIUXdAqGnV0BAmwpYp8x3QMhMRQVDXv7DjnBXlbcSrNxW6b' }}
                                 style={styles.profileImage}
                             />
                         </View>
