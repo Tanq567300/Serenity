@@ -38,7 +38,7 @@ export default function JournalEntryScreen() {
 
             if (response.data.success) {
                 // Return to Home Screen directly
-                navigation.navigate('Home');
+                navigation.navigate('MainTabs', { screen: 'Home' });
             } else {
                 setErrorMsg('Failed to save journal.');
             }
