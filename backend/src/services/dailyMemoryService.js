@@ -36,7 +36,7 @@ async function createDailyMemory(userId, date) {
 
     const moodEntries = await MoodEntry.find({
         userId,
-        timestamp: { $gte: startOfDay, $lte: endOfDay }
+        date: { $gte: startOfDay, $lte: endOfDay }
     });
 
     if (messages.length === 0 && moodEntries.length === 0) {
@@ -59,7 +59,7 @@ Interactions:
 ${decryptedMessages.map(m => `[${m.timestamp.toTimeString().split(' ')[0]}] ${m.role}: ${m.content}`).join('\n')}
 
 Mood Logs:
-${moodEntries.map(m => `[${m.timestamp.toTimeString().split(' ')[0]}] Emotion: ${m.emotion}, Score: ${m.score}, Note: ${m.note || ''}`).join('\n')}
+${moodEntries.map(m => `[${m.createdAt.toTimeString().split(' ')[0]}] Emotion: ${m.inferredEmotion || m.selectedMoodLabel}, Score: ${m.sliderScore}, Tags: ${(m.tags || []).join(', ')}`).join('\n')}
 
 Return ONLY valid JSON with this structure:
 {
