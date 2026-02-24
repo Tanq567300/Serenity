@@ -5,7 +5,7 @@ import ScreenBackground from '../components/ScreenBackground';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import axios from 'axios';
-import config from '../config';
+import { API_URL } from '../config';
 import * as SecureStore from 'expo-secure-store';
 
 export default function JournalEntryScreen() {
@@ -26,7 +26,7 @@ export default function JournalEntryScreen() {
         try {
             const token = await SecureStore.getItemAsync('userToken');
 
-            const response = await axios.post(`${config.API_URL}/api/mood/journal`, {
+            const response = await axios.post(`${API_URL}/mood/journal`, {
                 sliderScore,
                 selectedMoodLabel,
                 journalText: journalText.trim()
