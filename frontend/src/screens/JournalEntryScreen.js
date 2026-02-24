@@ -24,7 +24,7 @@ export default function JournalEntryScreen() {
         setErrorMsg(null);
 
         try {
-            const token = await SecureStore.getItemAsync('userToken');
+            const token = await SecureStore.getItemAsync('accessToken');
 
             const response = await axios.post(`${API_URL}/mood/journal`, {
                 sliderScore,
