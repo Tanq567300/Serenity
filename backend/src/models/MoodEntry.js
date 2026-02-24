@@ -7,30 +7,44 @@ const moodEntrySchema = new mongoose.Schema({
         required: true,
         index: true
     },
-    emotion: {
-        type: String,
+    date: {
+        type: Date,
+        default: Date.now,
         required: true
     },
-    score: {
+    sliderScore: {
         type: Number,
         required: true,
         min: 1,
-        max: 5
+        max: 10
     },
-    intensity: {
+    selectedMoodLabel: {
+        type: String,
+        required: true
+    },
+    journalText: {
+        type: String, // Encrypted
+        required: true
+    },
+    inferredEmotion: {
+        type: String
+    },
+    inferredMoodScore: {
         type: Number,
         min: 1,
         max: 10
     },
-    note: {
-        type: String, // Encrypted? For now, simple string as per basic req
-    },
-    timestamp: {
+    tags: [{
+        type: String
+    }],
+    createdAt: {
         type: Date,
-        default: Date.now,
-        index: true
+        default: Date.now
     }
 });
+
+// Add index on userId + date
+moodEntrySchema.index({ userId: 1, date: 1 });
 
 const MoodEntry = mongoose.model('MoodEntry', moodEntrySchema);
 
