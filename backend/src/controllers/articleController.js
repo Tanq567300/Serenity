@@ -68,8 +68,8 @@ exports.getPersonalizedArticles = async (req, res) => {
 
         const userId = req.user.userId;
 
-        const latestMood = await MoodEntry.findOne({ userId }).sort({ timestamp: -1 });
-        const moodUsed = normalizeMood(latestMood?.emotion);
+        const latestMood = await MoodEntry.findOne({ userId }).sort({ date: -1 });
+        const moodUsed = normalizeMood(latestMood?.inferredEmotion || latestMood?.selectedMoodLabel);
 
         const { articles, cacheStatus } = await getArticles(moodUsed);
 

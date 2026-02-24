@@ -10,7 +10,7 @@ const { encrypt, decrypt } = require('../utils/encryption');
  * @param {string} userId 
  * @param {Date} date - The date to summarize
  */
-async function createDailyMemory(userId, date) {
+async function createDailyMemory(userId, date, forceRegenerate = false) {
     const startOfDay = new Date(date);
     startOfDay.setHours(0, 0, 0, 0);
 
@@ -22,7 +22,7 @@ async function createDailyMemory(userId, date) {
         userId,
         date: { $gte: startOfDay, $lte: endOfDay }
     });
-    if (existing) return existing;
+    if (existing && !forceRegenerate) return existing;
 
     // 2. Fetch Data
     // Get user sessions first
@@ -36,7 +36,7 @@ async function createDailyMemory(userId, date) {
 
     const moodEntries = await MoodEntry.find({
         userId,
-        timestamp: { $gte: startOfDay, $lte: endOfDay }
+        date: { $gte: startOfDay, $lte: endOfDay }
     });
 
     if (messages.length === 0 && moodEntries.length === 0) {
@@ -59,7 +59,7 @@ Interactions:
 ${decryptedMessages.map(m => `[${m.timestamp.toTimeString().split(' ')[0]}] ${m.role}: ${m.content}`).join('\n')}
 
 Mood Logs:
-${moodEntries.map(m => `[${m.timestamp.toTimeString().split(' ')[0]}] Emotion: ${m.emotion}, Score: ${m.score}, Note: ${m.note || ''}`).join('\n')}
+${moodEntries.map(m => `[${m.createdAt.toTimeString().split(' ')[0]}] Emotion: ${m.inferredEmotion || m.selectedMoodLabel}, Score: ${m.sliderScore}, Tags: ${(m.tags || []).join(', ')}`).join('\n')}
 
 Return ONLY valid JSON with this structure:
 {
@@ -87,19 +87,28 @@ Return ONLY valid JSON with this structure:
         };
     }
 
-    // 5. Encrypt & Save
-    const dailyMemory = new DailyMemory({
-        userId,
-        date: startOfDay,
-        summary: encrypt(aiResult.summary),
-        dominantEmotion: aiResult.dominantEmotion,
-        averageMoodScore: aiResult.averageMoodScore,
-        tags: aiResult.tags,
-        keyStressors: aiResult.keyStressors
-    });
-
-    await dailyMemory.save();
-    return dailyMemory;
+    // 5. Encrypt & Save or Update
+    if (existing) {
+        existing.summary = encrypt(aiResult.summary);
+        existing.dominantEmotion = aiResult.dominantEmotion;
+        existing.averageMoodScore = aiResult.averageMoodScore;
+        existing.tags = aiResult.tags;
+        existing.keyStressors = aiResult.keyStressors;
+        await existing.save();
+        return existing;
+    } else {
+        const dailyMemory = new DailyMemory({
+            userId,
+            date: startOfDay,
+            summary: encrypt(aiResult.summary),
+            dominantEmotion: aiResult.dominantEmotion,
+            averageMoodScore: aiResult.averageMoodScore,
+            tags: aiResult.tags,
+            keyStressors: aiResult.keyStressors
+        });
+        await dailyMemory.save();
+        return dailyMemory;
+    }
 }
 
 module.exports = {
