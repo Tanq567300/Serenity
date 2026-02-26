@@ -30,13 +30,14 @@ const EXERCISE = {
 const CYCLE_DURATION = EXERCISE.phases.reduce((sum, p) => sum + p.duration, 0); // 12s
 const TOTAL_DURATION = EXERCISE.cycles * CYCLE_DURATION; // 120s
 
-/** Derives current phase label from total elapsed seconds. */
-const getPhase = (elapsed) => {
-    const positionInCycle = elapsed % CYCLE_DURATION;
-    let cumulative = 0;
+/** Derives current phase label from elapsed seconds (fractional). */
+const getPhase = (elapsedSeconds) => {
+    const cycleMs = CYCLE_DURATION * 1000;
+    const positionInCycleMs = (elapsedSeconds * 1000) % cycleMs;
+    let cumulativeMs = 0;
     for (const phase of EXERCISE.phases) {
-        cumulative += phase.duration;
-        if (positionInCycle < cumulative) return phase.label;
+        cumulativeMs += phase.duration * 1000;
+        if (positionInCycleMs < cumulativeMs) return phase.label;
     }
     return EXERCISE.phases[0].label;
 };
@@ -54,21 +55,21 @@ const BreathingExerciseScreen = () => {
     // Animated value for phase-label fade transition.
     const fadeAnim = useRef(new Animated.Value(1)).current;
 
-    // Use wall-clock time as the single source of truth to prevent drift.
+    // Millisecond-precision wall-clock timer — eliminates rounding lag at phase boundaries.
     useEffect(() => {
         const startTime = Date.now();
 
         const interval = setInterval(() => {
-            const secondsElapsed = Math.floor((Date.now() - startTime) / 1000);
+            const elapsedMs = Date.now() - startTime;
 
-            if (secondsElapsed >= TOTAL_DURATION) {
+            if (elapsedMs >= TOTAL_DURATION * 1000) {
                 setElapsed(TOTAL_DURATION);
                 setIsComplete(true);
                 clearInterval(interval);
             } else {
-                setElapsed(secondsElapsed);
+                setElapsed(elapsedMs / 1000); // fractional seconds
             }
-        }, 200); // poll 5× per second for accuracy
+        }, 100); // poll 10× per second for precision
 
         return () => clearInterval(interval);
     }, []);
