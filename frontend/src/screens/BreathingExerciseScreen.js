@@ -11,6 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import LottieView from 'lottie-react-native';
 import { useNavigation } from '@react-navigation/native';
+import * as Haptics from 'expo-haptics';
 import { useKeepAwake } from 'expo-keep-awake';
 import ScreenBackground from '../components/ScreenBackground';
 
@@ -74,7 +75,7 @@ const BreathingExerciseScreen = () => {
         return () => clearInterval(interval);
     }, []);
 
-    // Fade-transition the phase label whenever the phase changes.
+    // Fade-transition the phase label and emit a subtle haptic whenever the phase changes.
     useEffect(() => {
         const nextPhase = getPhase(elapsed);
         if (nextPhase !== currentPhase) {
@@ -83,6 +84,9 @@ const BreathingExerciseScreen = () => {
                 Animated.timing(fadeAnim, { toValue: 1, duration: 300, useNativeDriver: true }),
             ]).start();
             setCurrentPhase(nextPhase);
+
+            // Subtle tactile cue at each phase boundary
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         }
     }, [elapsed]);
 
