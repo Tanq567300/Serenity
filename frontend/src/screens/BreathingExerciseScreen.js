@@ -17,30 +17,43 @@ import ScreenBackground from '../components/ScreenBackground';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
-// Exercise config — structured for easy extension with additional exercises later.
-const EXERCISE = {
-    name: '4-4-4 Breathing',
-    phases: [
-        { label: 'Inhale', duration: 4 },
-        { label: 'Hold', duration: 4 },
-        { label: 'Exhale', duration: 4 },
-    ],
-    cycles: 10, // 10 × 12s = 120s ≈ 2 minutes
+// Breathing technique registry — add new techniques here; no engine logic changes needed.
+const EXERCISES = {
+    box444: {
+        id: 'box444',
+        name: '4-4-4 Breathing',
+        phases: [
+            { label: 'Inhale', duration: 4 },
+            { label: 'Hold', duration: 4 },
+            { label: 'Exhale', duration: 4 },
+        ],
+        cycles: 10, // 10 × 12s = 120s ≈ 2 minutes
+    },
+    fourSevenEight: {
+        id: '478',
+        name: '4-7-8 Breathing',
+        phases: [
+            { label: 'Inhale', duration: 4 },
+            { label: 'Hold', duration: 7 },
+            { label: 'Exhale', duration: 8 },
+        ],
+        cycles: 6, // 6 × 19s = 114s ≈ 2 minutes
+    },
 };
 
-const CYCLE_DURATION = EXERCISE.phases.reduce((sum, p) => sum + p.duration, 0); // 12s
-const TOTAL_DURATION = EXERCISE.cycles * CYCLE_DURATION; // 120s
-
-/** Derives current phase label from elapsed seconds (fractional). */
-const getPhase = (elapsedSeconds) => {
-    const cycleMs = CYCLE_DURATION * 1000;
+/**
+ * Derives current phase label from elapsed seconds (fractional).
+ * Exercise-agnostic — driven entirely by the phases array and cycleDuration.
+ */
+const getPhase = (elapsedSeconds, phases, cycleDuration) => {
+    const cycleMs = cycleDuration * 1000;
     const positionInCycleMs = (elapsedSeconds * 1000) % cycleMs;
     let cumulativeMs = 0;
-    for (const phase of EXERCISE.phases) {
+    for (const phase of phases) {
         cumulativeMs += phase.duration * 1000;
         if (positionInCycleMs < cumulativeMs) return phase.label;
     }
-    return EXERCISE.phases[0].label;
+    return phases[0].label;
 };
 
 const BreathingExerciseScreen = () => {
@@ -49,8 +62,15 @@ const BreathingExerciseScreen = () => {
     // Keep the screen on for the duration of the session.
     useKeepAwake();
 
+    // Active exercise — swap this value to switch techniques; UI selector can be added later.
+    const [selectedExercise] = useState(EXERCISES.box444);
+
+    // Derive timing constants from the selected exercise so nothing is hardcoded.
+    const cycleDuration = selectedExercise.phases.reduce((sum, p) => sum + p.duration, 0);
+    const totalDuration = selectedExercise.cycles * cycleDuration;
+
     const [elapsed, setElapsed] = useState(0);
-    const [currentPhase, setCurrentPhase] = useState(EXERCISE.phases[0].label);
+    const [currentPhase, setCurrentPhase] = useState(selectedExercise.phases[0].label);
     const [isComplete, setIsComplete] = useState(false);
 
     // Animated value for phase-label fade transition.
@@ -63,8 +83,8 @@ const BreathingExerciseScreen = () => {
         const interval = setInterval(() => {
             const elapsedMs = Date.now() - startTime;
 
-            if (elapsedMs >= TOTAL_DURATION * 1000) {
-                setElapsed(TOTAL_DURATION);
+            if (elapsedMs >= totalDuration * 1000) {
+                setElapsed(totalDuration);
                 setIsComplete(true);
                 clearInterval(interval);
             } else {
@@ -77,7 +97,7 @@ const BreathingExerciseScreen = () => {
 
     // Fade-transition the phase label and emit a subtle haptic whenever the phase changes.
     useEffect(() => {
-        const nextPhase = getPhase(elapsed);
+        const nextPhase = getPhase(elapsed, selectedExercise.phases, cycleDuration);
         if (nextPhase !== currentPhase) {
             Animated.sequence([
                 Animated.timing(fadeAnim, { toValue: 0, duration: 200, useNativeDriver: true }),
@@ -90,8 +110,8 @@ const BreathingExerciseScreen = () => {
         }
     }, [elapsed]);
 
-    const cycleNumber = Math.min(Math.floor(elapsed / CYCLE_DURATION) + 1, EXERCISE.cycles);
-    const progressPercent = (elapsed / TOTAL_DURATION) * 100;
+    const cycleNumber = Math.min(Math.floor(elapsed / cycleDuration) + 1, selectedExercise.cycles);
+    const progressPercent = (elapsed / totalDuration) * 100;
     return (
         <SafeAreaView style={styles.container}>
             <ScreenBackground variant="insights" />
@@ -105,7 +125,7 @@ const BreathingExerciseScreen = () => {
                 >
                     <MaterialIcons name="chevron-left" size={28} color="#1a2e1a" />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>{EXERCISE.name}</Text>
+                <Text style={styles.headerTitle}>{selectedExercise.name}</Text>
                 <View style={styles.backBtn} pointerEvents="none" />
             </View>
 
@@ -117,7 +137,7 @@ const BreathingExerciseScreen = () => {
             {/* Cycle counter */}
             {!isComplete && (
                 <Text style={styles.cycleCounter}>
-                    Cycle {cycleNumber} of {EXERCISE.cycles}
+                    Cycle {cycleNumber} of {selectedExercise.cycles}
                 </Text>
             )}
 
