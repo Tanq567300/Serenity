@@ -8,6 +8,9 @@ import RegisterScreen from '../screens/RegisterScreen';
 import ChatScreen from '../screens/ChatScreen';
 import ArticleDetailScreen from '../screens/ArticleDetailScreen';
 import BreathingExerciseScreen from '../screens/BreathingExerciseScreen';
+import MoodSliderScreen from '../screens/MoodSliderScreen';
+import MoodPresetScreen from '../screens/MoodPresetScreen';
+import JournalEntryScreen from '../screens/JournalEntryScreen';
 import MainTabNavigator from './MainTabNavigator';
 
 const Stack = createNativeStackNavigator();
@@ -56,6 +59,21 @@ const AppNavigator = () => {
                             options={{
                                 animation: 'slide_from_right',
                             }}
+                        />
+                        <Stack.Screen
+                            name="MoodSlider"
+                            component={MoodSliderScreen}
+                            options={{ animation: 'slide_from_bottom', presentation: 'card' }}
+                        />
+                        <Stack.Screen
+                            name="MoodPreset"
+                            component={MoodPresetScreen}
+                            options={{ animation: 'slide_from_right' }}
+                        />
+                        <Stack.Screen
+                            name="JournalEntry"
+                            component={JournalEntryScreen}
+                            options={{ animation: 'slide_from_right' }}
                         />
                     </>
                 ) : (

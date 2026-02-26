@@ -492,18 +492,10 @@ const JournalList = ({ onWriteEntry, onOpenEntry }) => {
 
 // ─── Root JournalScreen ──────────────────────────────────────────────────────
 const JournalScreen = () => {
-    const [view, setView] = useState('list'); // 'list' | 'editor' | 'viewer'
+    const navigation = useNavigation();
+    const [view, setView] = useState('list'); // 'list' | 'viewer'
     const [selectedEntry, setSelectedEntry] = useState(null);
     const [refreshKey, setRefreshKey] = useState(0);
-
-    const handleSaveSuccess = () => {
-        setView('list');
-        setRefreshKey(k => k + 1);
-    };
-
-    if (view === 'editor') {
-        return <JournalEditor onBack={() => setView('list')} onSaveSuccess={handleSaveSuccess} />;
-    }
 
     if (view === 'viewer' && selectedEntry) {
         return <JournalViewer entry={selectedEntry} onBack={() => setView('list')} />;
@@ -512,7 +504,7 @@ const JournalScreen = () => {
     return (
         <JournalList
             key={refreshKey}
-            onWriteEntry={() => setView('editor')}
+            onWriteEntry={() => navigation.navigate('MoodSlider')}
             onOpenEntry={(entry) => { setSelectedEntry(entry); setView('viewer'); }}
         />
     );

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gooey Fluid Mobile Nav</title>
+    <style>
+        /* Modern Color Palette */
+        :root {
+            --bg-color: #e2e6f0;
+            /* Slightly darker background to make the white nav pop */
+            --nav-bg: #ffffff;
+            /* Background of the navbar & ball */
+            --active-color: #5b32f4;
+            /* Accent color */
+            --text-color: #8e94a3;
+            /* Inactive text/icon color */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            min-height: 100vh;
+            padding-bottom: 3rem;
+            background: var(--bg-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+
+        /* Main Wrapper */
+        .nav-wrapper {
+            position: relative;
+            width: 400px;
+            max-width: 90vw;
+            height: 70px;
+            /* Drop shadow is applied here so it shadows the final "gooey" shape */
+            filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.1));
+        }
+
+        /* * LAYER 1: The Liquid Background 
+         * This layer is affected by the SVG filter. Anything inside here melts together.
+         */
+        .fluid-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            filter: url('#goo');
+            z-index: 1;
+        }
+
+        /* The main rectangle of the nav */
+        .nav-rect {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--nav-bg);
+            border-radius: 20px;
+        }
+
+        /* The container that moves the ball */
+        .ball-mover {
+            position: absolute;
+            top: -30px;
+            /* Pulls the ball up above the nav */
+            left: 0;
+            width: 25%;
+            /* Matches the 4-item grid (25% each) */
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            /* The bouncy cubic-bezier creates the fast-snap liquid look */
+            transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        /* The actual melting ball */
+        .indicator-ball {
+            width: 60px;
+            height: 60px;
+            background: var(--nav-bg);
+            border-radius: 50%;
+        }
+
+        /* * LAYER 2: The Interactive Foreground 
+         * Sits above the gooey filter so text and SVGs remain perfectly sharp.
+         */
+        .navigation {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+        }
+
+        .navigation ul {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            list-style: none;
+        }
+
+        .navigation ul li {
+            position: relative;
+            width: 25%;
+            height: 100%;
+        }
+
+        .navigation ul li a {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            text-decoration: none;
+        }
+
+        /* Icon Styles */
+        .navigation ul li a .icon {
+            position: absolute;
+            font-size: 1.6em;
+            color: var(--text-color);
+            transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55), color 0.4s;
+        }
+
+        /* Active Icon pops up perfectly into the center of the ball */
+        .navigation ul li.active a .icon {
+            transform: translateY(-35px);
+            color: var(--active-color);
+        }
+
+        /* Text Styles */
+        .navigation ul li a .text {
+            position: absolute;
+            color: var(--text-color);
+            font-size: 0.75em;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: 0.5s;
+        }
+
+        /* Active Text fades in */
+        .navigation ul li.active a .text {
+            opacity: 1;
+            transform: translateY(15px);
+            color: var(--active-color);
+        }
+
+        /* * Modern CSS Magic Logic 
+         * Uses :has() to track the active list item and move the ball-mover accordingly.
+         */
+        .nav-wrapper:has(li:nth-child(1).active) .ball-mover {
+            transform: translateX(0);
+        }
+
+        .nav-wrapper:has(li:nth-child(2).active) .ball-mover {
+            transform: translateX(100%);
+        }
+
+        .nav-wrapper:has(li:nth-child(3).active) .ball-mover {
+            transform: translateX(200%);
+        }
+
+        .nav-wrapper:has(li:nth-child(4).active) .ball-mover {
+            transform: translateX(300%);
+        }
+    </style>
+</head>
+
+<body>
+
+    <svg width="0" height="0" style="position: absolute;">
+        <defs>
+            <filter id="goo" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur" />
+                <feColorMatrix in="blur" mode="matrix" values="
+                    1 0 0 0 0  
+                    0 1 0 0 0  
+                    0 0 1 0 0  
+                    0 0 0 20 -9" result="goo" />
+                <feBlend in="SourceGraphic" in2="goo" />
+            </filter>
+        </defs>
+    </svg>
+
+    <div class="nav-wrapper">
+
+        <div class="fluid-bg">
+            <div class="nav-rect"></div>
+            <div class="ball-mover">
+                <div class="indicator-ball"></div>
+            </div>
+        </div>
+
+        <nav class="navigation">
+            <ul>
+                <li class="list active">
+                    <a href="#">
+                        <span class="icon"><ion-icon name="home-outline"></ion-icon></span>
+                        <span class="text">Home</span>
+                    </a>
+                </li>
+                <li class="list">
+                    <a href="#">
+                        <span class="icon"><ion-icon name="person-outline"></ion-icon></span>
+                        <span class="text">Profile</span>
+                    </a>
+                </li>
+                <li class="list">
+                    <a href="#">
+                        <span class="icon"><ion-icon name="chatbubble-outline"></ion-icon></span>
+                        <span class="text">Chat</span>
+                    </a>
+                </li>
+                <li class="list">
+                    <a href="#">
+                        <span class="icon"><ion-icon name="settings-outline"></ion-icon></span>
+                        <span class="text">Settings</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
+    <script>
+        const listItems = document.querySelectorAll('.list');
+
+        listItems.forEach((item) => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault(); // Prevents the page from jumping when clicking links
+
+                // Remove active class from all
+                listItems.forEach((el) => el.classList.remove('active'));
+
+                // Add active class to clicked item
+                item.classList.add('active');
+            });
+        });
+    </script>
+</body>
+
+</html>
