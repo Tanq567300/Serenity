@@ -41,6 +41,16 @@ const EXERCISES = {
         cycles: 5, // 5 × 19s = 95s ≈ 1.5 minutes
         lottie: require('../../assets/lottie/breathing_1.json'),
     },
+    coherent55: {
+        id: 'coherent55',
+        name: '5-5 Breathing',
+        phases: [
+            { label: 'Inhale', duration: 5 },
+            { label: 'Exhale', duration: 5 },
+        ],
+        cycles: 12, // 12 × 10s = 120s ≈ 2 minutes
+        lottie: require('../../assets/lottie/breathing_2.json'),
+    },
 };
 
 /**
@@ -68,10 +78,12 @@ const BreathingExerciseScreen = ({ route }) => {
     const exerciseId = route?.params?.exerciseId ?? 'box444';
     const selectedExercise = EXERCISES[exerciseId] ?? EXERCISES.box444;
 
-    // Toggles between techniques without growing the navigation stack.
+    // Cycles through all techniques without growing the navigation stack.
+    const exerciseOrder = ['box444', 'fourSevenEight', 'coherent55'];
     const handleSwitchExercise = () => {
-        const nextId = selectedExercise.id === 'box444' ? 'fourSevenEight' : 'box444';
-        navigation.replace('BreathingExercise', { exerciseId: nextId });
+        const currentIndex = exerciseOrder.indexOf(selectedExercise.id);
+        const nextExercise = exerciseOrder[(currentIndex + 1) % exerciseOrder.length];
+        navigation.replace('BreathingExercise', { exerciseId: nextExercise });
     };
 
     // Derive timing constants from the selected exercise so nothing is hardcoded.
@@ -110,12 +122,13 @@ const BreathingExerciseScreen = ({ route }) => {
     }, []);
 
     // Distinct haptic feedback per phase — fired only on an actual transition.
+    // Hold haptic only fires when the current exercise actually has a Hold phase.
     const hapticForPhase = async (label) => {
         if (label === 'Inhale') {
             await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
         } else if (label === 'Hold') {
             await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        } else {
+        } else if (label === 'Exhale') {
             await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         }
     };
@@ -205,7 +218,7 @@ const BreathingExerciseScreen = ({ route }) => {
                             ? 'Breathe in slowly…'
                             : currentPhase === 'Hold'
                                 ? 'Hold gently…'
-                                : 'Release slowly…'}
+                                : 'Release gently…'}
                     </Text>
                 </View>
             )}
