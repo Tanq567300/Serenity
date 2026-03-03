@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { Audio } from 'expo-av';
 import {
     View,
     Text,
@@ -29,6 +30,7 @@ const EXERCISES = {
         ],
         cycles: 10, // 10 × 12s = 120s ≈ 2 minutes
         lottie: require('../../assets/lottie/breathing.json'),
+        audio: require('../../assets/music/audio.mp3'),
     },
     fourSevenEight: {
         id: 'fourSevenEight',
@@ -40,6 +42,7 @@ const EXERCISES = {
         ],
         cycles: 5, // 5 × 19s = 95s ≈ 1.5 minutes
         lottie: require('../../assets/lottie/breathing_1.json'),
+        audio: require('../../assets/music/audio_1.mp3'),
     },
     coherent55: {
         id: 'coherent55',
@@ -50,6 +53,7 @@ const EXERCISES = {
         ],
         cycles: 12, // 12 × 10s = 120s ≈ 2 minutes
         lottie: require('../../assets/lottie/breathing_2.json'),
+        audio: require('../../assets/music/audio_2.mp3'),
     },
 };
 
@@ -95,12 +99,62 @@ const BreathingExerciseScreen = ({ route }) => {
     const totalDurationRef = useRef(totalDuration);
     const phasesRef = useRef(selectedExercise.phases);
 
+    // Audio state
+    const soundRef = useRef(null);
+    const [isMuted, setIsMuted] = useState(false);
+
     const [elapsed, setElapsed] = useState(0);
     const [currentPhase, setCurrentPhase] = useState(selectedExercise.phases[0].label);
     const [isComplete, setIsComplete] = useState(false);
 
     // Animated value for phase-label fade transition.
     const fadeAnim = useRef(new Animated.Value(1)).current;
+
+    // Audio lifecycle — loads ONCE on mount, unloads ONCE on unmount.
+    // [] is correct: navigation.replace fully remounts on exercise switch.
+    // DO NOT add any dependency here — any state dependency causes restart.
+    useEffect(() => {
+        let sound; // local reference so cleanup is always accurate
+
+        const loadAndPlay = async () => {
+            // Configure audio session (required on iOS for looping in silent mode).
+            await Audio.setAudioModeAsync({
+                allowsRecordingIOS: false,
+                staysActiveInBackground: false,
+                playsInSilentModeIOS: true,
+                shouldDuckAndroid: true,
+            });
+
+            const { sound: created } = await Audio.Sound.createAsync(
+                selectedExercise.audio,
+                { isLooping: true, volume: 1.0 }
+            );
+
+            sound = created;
+            soundRef.current = sound;
+            await sound.playAsync();
+        };
+
+        loadAndPlay();
+
+        return () => {
+            // Use local `sound` — soundRef.current may have been cleared already.
+            if (sound) {
+                sound.stopAsync().then(() => sound.unloadAsync());
+            }
+            soundRef.current = null;
+        };
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+    // Mute / unmute — volume only, never restarts audio.
+    const handleToggleMute = async () => {
+        const newMuted = !isMuted;
+        setIsMuted(newMuted);
+        if (soundRef.current) {
+            await soundRef.current.setVolumeAsync(newMuted ? 0 : 1);
+        }
+    };
+
 
     // Millisecond-precision wall-clock timer — eliminates rounding lag at phase boundaries.
     useEffect(() => {
@@ -162,13 +216,26 @@ const BreathingExerciseScreen = ({ route }) => {
                     <MaterialIcons name="chevron-left" size={28} color="#1a2e1a" />
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>{selectedExercise.name}</Text>
-                <TouchableOpacity
-                    style={styles.switchBtn}
-                    onPress={handleSwitchExercise}
-                    activeOpacity={0.7}
-                >
-                    <MaterialIcons name="arrow-forward" size={22} color="#1a2e1a" />
-                </TouchableOpacity>
+                <View style={styles.headerRight}>
+                    <TouchableOpacity
+                        style={styles.muteBtn}
+                        onPress={handleToggleMute}
+                        activeOpacity={0.7}
+                    >
+                        <MaterialIcons
+                            name={isMuted ? 'volume-off' : 'volume-up'}
+                            size={22}
+                            color="#1a2e1a"
+                        />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={styles.switchBtn}
+                        onPress={handleSwitchExercise}
+                        activeOpacity={0.7}
+                    >
+                        <MaterialIcons name="arrow-forward" size={22} color="#1a2e1a" />
+                    </TouchableOpacity>
+                </View>
             </View>
 
             {/* Progress bar — fills smoothly over 120 seconds */}
@@ -245,6 +312,24 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(255,255,255,0.8)',
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    headerRight: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+    },
+    muteBtn: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: 'rgba(255,255,255,0.8)',
+        alignItems: 'center',
+        justifyContent: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 6,
+        elevation: 3,
     },
     switchBtn: {
         width: 40,
