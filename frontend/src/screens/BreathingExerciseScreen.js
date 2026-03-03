@@ -28,16 +28,18 @@ const EXERCISES = {
             { label: 'Exhale', duration: 4 },
         ],
         cycles: 10, // 10 × 12s = 120s ≈ 2 minutes
+        lottie: require('../../assets/lottie/breathing.json'),
     },
     fourSevenEight: {
-        id: '478',
+        id: 'fourSevenEight',
         name: '4-7-8 Breathing',
         phases: [
             { label: 'Inhale', duration: 4 },
             { label: 'Hold', duration: 7 },
             { label: 'Exhale', duration: 8 },
         ],
-        cycles: 6, // 6 × 19s = 114s ≈ 2 minutes
+        cycles: 5, // 5 × 19s = 95s ≈ 1.5 minutes
+        lottie: require('../../assets/lottie/breathing_1.json'),
     },
 };
 
@@ -56,18 +58,30 @@ const getPhase = (elapsedSeconds, phases, cycleDuration) => {
     return phases[0].label;
 };
 
-const BreathingExerciseScreen = () => {
+const BreathingExerciseScreen = ({ route }) => {
     const navigation = useNavigation();
 
     // Keep the screen on for the duration of the session.
     useKeepAwake();
 
-    // Active exercise — swap this value to switch techniques; UI selector can be added later.
-    const [selectedExercise] = useState(EXERCISES.box444);
+    // Route-based exercise selection — defaults to 4-4-4 when no params are supplied.
+    const exerciseId = route?.params?.exerciseId ?? 'box444';
+    const selectedExercise = EXERCISES[exerciseId] ?? EXERCISES.box444;
+
+    // Toggles between techniques without growing the navigation stack.
+    const handleSwitchExercise = () => {
+        const nextId = selectedExercise.id === 'box444' ? 'fourSevenEight' : 'box444';
+        navigation.replace('BreathingExercise', { exerciseId: nextId });
+    };
 
     // Derive timing constants from the selected exercise so nothing is hardcoded.
     const cycleDuration = selectedExercise.phases.reduce((sum, p) => sum + p.duration, 0);
     const totalDuration = selectedExercise.cycles * cycleDuration;
+
+    // Freeze exercise data in refs so interval/effect closures never read stale values.
+    const cycleDurationRef = useRef(cycleDuration);
+    const totalDurationRef = useRef(totalDuration);
+    const phasesRef = useRef(selectedExercise.phases);
 
     const [elapsed, setElapsed] = useState(0);
     const [currentPhase, setCurrentPhase] = useState(selectedExercise.phases[0].label);
@@ -83,8 +97,8 @@ const BreathingExerciseScreen = () => {
         const interval = setInterval(() => {
             const elapsedMs = Date.now() - startTime;
 
-            if (elapsedMs >= totalDuration * 1000) {
-                setElapsed(totalDuration);
+            if (elapsedMs >= totalDurationRef.current * 1000) {
+                setElapsed(totalDurationRef.current);
                 setIsComplete(true);
                 clearInterval(interval);
             } else {
@@ -95,23 +109,32 @@ const BreathingExerciseScreen = () => {
         return () => clearInterval(interval);
     }, []);
 
-    // Fade-transition the phase label and emit a subtle haptic whenever the phase changes.
+    // Distinct haptic feedback per phase — fired only on an actual transition.
+    const hapticForPhase = async (label) => {
+        if (label === 'Inhale') {
+            await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        } else if (label === 'Hold') {
+            await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        } else {
+            await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        }
+    };
+
+    // Fade-transition the phase label and emit a haptic whenever the phase changes.
     useEffect(() => {
-        const nextPhase = getPhase(elapsed, selectedExercise.phases, cycleDuration);
+        const nextPhase = getPhase(elapsed, phasesRef.current, cycleDurationRef.current);
         if (nextPhase !== currentPhase) {
             Animated.sequence([
                 Animated.timing(fadeAnim, { toValue: 0, duration: 200, useNativeDriver: true }),
                 Animated.timing(fadeAnim, { toValue: 1, duration: 300, useNativeDriver: true }),
             ]).start();
+            hapticForPhase(nextPhase);
             setCurrentPhase(nextPhase);
-
-            // Subtle tactile cue at each phase boundary
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         }
     }, [elapsed]);
 
-    const cycleNumber = Math.min(Math.floor(elapsed / cycleDuration) + 1, selectedExercise.cycles);
-    const progressPercent = (elapsed / totalDuration) * 100;
+    const cycleNumber = Math.min(Math.floor(elapsed / cycleDurationRef.current) + 1, selectedExercise.cycles);
+    const progressPercent = (elapsed / totalDurationRef.current) * 100;
     return (
         <SafeAreaView style={styles.container}>
             <ScreenBackground variant="insights" />
@@ -126,7 +149,13 @@ const BreathingExerciseScreen = () => {
                     <MaterialIcons name="chevron-left" size={28} color="#1a2e1a" />
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>{selectedExercise.name}</Text>
-                <View style={styles.backBtn} pointerEvents="none" />
+                <TouchableOpacity
+                    style={styles.switchBtn}
+                    onPress={handleSwitchExercise}
+                    activeOpacity={0.7}
+                >
+                    <MaterialIcons name="arrow-forward" size={22} color="#1a2e1a" />
+                </TouchableOpacity>
             </View>
 
             {/* Progress bar — fills smoothly over 120 seconds */}
@@ -144,7 +173,7 @@ const BreathingExerciseScreen = () => {
             {/* Lottie animation — fully synced to breathing cycle */}
             <View style={styles.animationContainer}>
                 <LottieView
-                    source={require('../../assets/lottie/breathing.json')}
+                    source={selectedExercise.lottie}
                     autoPlay
                     loop
                     style={styles.lottie}
@@ -203,6 +232,19 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(255,255,255,0.8)',
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    switchBtn: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: 'rgba(255,255,255,0.8)',
+        alignItems: 'center',
+        justifyContent: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 6,
+        elevation: 3,
     },
     headerTitle: {
         fontSize: 18,
