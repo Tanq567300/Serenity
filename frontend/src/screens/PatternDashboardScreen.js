@@ -92,7 +92,10 @@ const PatternDashboardScreen = () => {
                     </View>
                 </View>
 
-                <DailySummaryCard memory={dailyMemory} />
+                <DailySummaryCard
+                    memory={dailyMemory}
+                    onStartBreathing={() => navigation.navigate('BreathingExercise')}
+                />
 
                 {!dailyMemory && (
                     <View style={styles.noDataCard}>

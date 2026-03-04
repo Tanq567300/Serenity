@@ -73,6 +73,26 @@ const useChatStore = create((set, get) => ({
         }
     },
 
+
+    // Injects a breathing redirect without calling the AI backend.
+    // Used when the chat screen detects a breathing intent locally.
+    injectBreathingRedirect: (messageText, exerciseId) => {
+        const userMsg = {
+            id: Date.now().toString(),
+            role: 'user',
+            content: messageText,
+            timestamp: new Date().toISOString(),
+        };
+        const redirectMsg = {
+            id: (Date.now() + 1).toString(),
+            role: 'assistant',
+            type: 'breathing_redirect',
+            exerciseId,
+            timestamp: new Date().toISOString(),
+        };
+        set(state => ({ messages: [...state.messages, userMsg, redirectMsg] }));
+    },
+
     // Generic add message (if needed for restoring history)
     setMessages: (history) => {
         set({ messages: history });

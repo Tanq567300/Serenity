@@ -69,10 +69,47 @@ const getSmartSuggestions = (messages) => {
     return ["I'm feeling anxious", "I need to vent", "Tell me a breathing exercise"];
 };
 
+// ── Breathing intent detection ──────────────────────────────────────────────
+
+const BREATHING_TRIGGERS = [
+    'breathing exercise', 'breathing', 'breathe', 'box breathing',
+    'help me breathe', 'guide breathing', 'slow breathing',
+    'calm down', 'help me calm', 'need to relax',
+];
+
+const detectBreathingIntent = (message) => {
+    const text = message.toLowerCase();
+    return BREATHING_TRIGGERS.some(trigger => text.includes(trigger));
+};
+
+const detectEmotion = (message) => {
+    const text = message.toLowerCase();
+    if (text.includes('anxious') || text.includes('panic') || text.includes("can't calm")) {
+        return 'anxiety';
+    }
+    if (text.includes('tired') || text.includes('burnout') || text.includes('exhausted')) {
+        return 'fatigue';
+    }
+    return 'stress';
+};
+
+const chooseBreathingTechnique = (emotion) => {
+    if (emotion === 'anxiety') return 'fourSevenEight';
+    if (emotion === 'fatigue') return 'coherent55';
+    return 'box444';
+};
+
+const TECHNIQUE_LABELS = {
+    box444: '4-4-4 Breathing',
+    fourSevenEight: '4-7-8 Breathing',
+    coherent55: '5-5 Breathing',
+};
+const getTechniqueLabel = (id) => TECHNIQUE_LABELS[id] || 'Breathing Exercise';
+
 const ChatScreen = ({ navigation, route }) => {
     const initialMessage = route?.params?.initialMessage || null;
 
-    const { messages, isTyping, isCrisis, initializeSession, sendMessage, clearChat, error } = useChatStore();
+    const { messages, isTyping, isCrisis, initializeSession, sendMessage, injectBreathingRedirect, clearChat, error } = useChatStore();
 
     const [inputText, setInputText] = useState('');
     const [menuVisible, setMenuVisible] = useState(false);
@@ -106,10 +143,26 @@ const ChatScreen = ({ navigation, route }) => {
         if (!inputText.trim()) return;
         const text = inputText;
         setInputText('');
+
+        if (detectBreathingIntent(text)) {
+            const last = messages[messages.length - 1];
+            if (last?.type !== 'breathing_redirect') {
+                injectBreathingRedirect(text, chooseBreathingTechnique(detectEmotion(text)));
+            }
+            return;
+        }
+
         await sendMessage(text);
     };
 
     const handleSuggestion = async (text) => {
+        if (detectBreathingIntent(text)) {
+            const last = messages[messages.length - 1];
+            if (last?.type !== 'breathing_redirect') {
+                injectBreathingRedirect(text, chooseBreathingTechnique(detectEmotion(text)));
+            }
+            return;
+        }
         await sendMessage(text);
     };
 
@@ -127,14 +180,32 @@ const ChatScreen = ({ navigation, route }) => {
 
     const suggestions = getSmartSuggestions(messages);
 
-    const renderItem = ({ item }) => (
-        <ChatBubble
-            role={item.role}
-            content={item.content}
-            isCrisis={item.isCrisis}
-            resources={item.resources}
-        />
-    );
+    const renderItem = ({ item }) => {
+        if (item.type === 'breathing_redirect') {
+            return (
+                <View style={styles.breathingCard}>
+                    <Text style={styles.breathingCardLabel}>Breathing Exercise</Text>
+                    <Text style={styles.breathingCardText}>Take a moment to reset.</Text>
+                    <Text style={styles.breathingCardTechnique}>{getTechniqueLabel(item.exerciseId)}</Text>
+                    <TouchableOpacity
+                        style={styles.breathingCardButton}
+                        onPress={() => navigation.navigate('BreathingExercise', { exerciseId: item.exerciseId })}
+                        activeOpacity={0.85}
+                    >
+                        <Text style={styles.breathingCardButtonText}>Start Breathing</Text>
+                    </TouchableOpacity>
+                </View>
+            );
+        }
+        return (
+            <ChatBubble
+                role={item.role}
+                content={item.content}
+                isCrisis={item.isCrisis}
+                resources={item.resources}
+            />
+        );
+    };
 
     return (
         <View style={styles.root}>
@@ -517,6 +588,60 @@ const styles = StyleSheet.create({
         fontSize: 15,
         fontWeight: '600',
         color: '#ef4444',
+    },
+
+    // ── Breathing redirect card ──
+    breathingCard: {
+        alignSelf: 'flex-start',
+        maxWidth: '82%',
+        marginTop: 8,
+        padding: 14,
+        backgroundColor: 'rgba(255,255,255,0.75)',
+        borderRadius: 16,
+        borderWidth: 1,
+        borderColor: 'rgba(0,0,0,0.04)',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.04,
+        shadowRadius: 8,
+        elevation: 2,
+        gap: 4,
+    },
+    breathingCardLabel: {
+        fontSize: 10,
+        fontWeight: '700',
+        color: '#36a836',
+        letterSpacing: 0.8,
+        textTransform: 'uppercase',
+        marginBottom: 2,
+    },
+    breathingCardText: {
+        fontSize: 15,
+        color: '#1a2e1a',
+        fontWeight: '500',
+    },
+    breathingCardTechnique: {
+        fontSize: 12,
+        color: '#64748b',
+        marginBottom: 6,
+    },
+    breathingCardButton: {
+        alignSelf: 'flex-start',
+        backgroundColor: '#36e236',
+        paddingVertical: 8,
+        paddingHorizontal: 14,
+        borderRadius: 10,
+        marginTop: 6,
+        shadowColor: '#36e236',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 6,
+        elevation: 2,
+    },
+    breathingCardButtonText: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: '#0e1b0e',
     },
 });
 
