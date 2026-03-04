@@ -99,6 +99,9 @@ const BreathingExerciseScreen = ({ route }) => {
     const totalDurationRef = useRef(totalDuration);
     const phasesRef = useRef(selectedExercise.phases);
 
+    // Animation ref — used to pause on completion.
+    const lottieRef = useRef(null);
+
     // Audio state
     const soundRef = useRef(null);
     const [isMuted, setIsMuted] = useState(false);
@@ -155,6 +158,17 @@ const BreathingExerciseScreen = ({ route }) => {
         }
     };
 
+
+    // Stop music and freeze animation when the exercise finishes.
+    useEffect(() => {
+        if (!isComplete) return;
+        // Pause animation on its current frame.
+        lottieRef.current?.pause();
+        // Stop audio — no more looping.
+        if (soundRef.current) {
+            soundRef.current.stopAsync();
+        }
+    }, [isComplete]);
 
     // Millisecond-precision wall-clock timer — eliminates rounding lag at phase boundaries.
     useEffect(() => {
@@ -253,6 +267,7 @@ const BreathingExerciseScreen = ({ route }) => {
             {/* Lottie animation — fully synced to breathing cycle */}
             <View style={styles.animationContainer}>
                 <LottieView
+                    ref={lottieRef}
                     source={selectedExercise.lottie}
                     autoPlay
                     loop
