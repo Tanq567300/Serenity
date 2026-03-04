@@ -79,8 +79,7 @@ const login = async (req, res, next) => {
         const refreshToken = generateRefreshToken(user._id);
 
         // Update lastLogin
-        user.lastLogin = new Date();
-        await user.save();
+        await User.updateOne({ _id: user._id }, { $set: { lastLogin: new Date() } });
 
         res.status(200).json({
             success: true,
