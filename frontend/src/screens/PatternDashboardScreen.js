@@ -149,7 +149,7 @@ const PatternDashboardScreen = () => {
                     </View>
                     <Text style={styles.breathingTitle}>Guided Breathing Exercise</Text>
                     <Text style={styles.breathingSubtitle}>
-                        Take 2 minutes to reset with a 4-4-4 breathing cycle.
+                        Take a moment your way. Try a different breathing style whenever you need.
                     </Text>
                     <TouchableOpacity
                         style={styles.breathingBtn}
