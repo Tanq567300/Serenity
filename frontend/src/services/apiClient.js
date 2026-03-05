@@ -23,10 +23,32 @@ export async function safeRequest(requestFn) {
             data: response.data,
         };
     } catch (error) {
-        console.warn('API request failed:', error?.message);
+        console.warn('API Error:', error?.message);
+
+        // Request timed out
+        if (error.code === 'ECONNABORTED' || error.code === 'ETIMEDOUT') {
+            return {
+                success: false,
+                type: 'TIMEOUT_ERROR',
+                message: 'Request timed out',
+            };
+        }
+
+        // No response received — device offline or server unreachable
+        if (!error.response) {
+            return {
+                success: false,
+                type: 'NETWORK_ERROR',
+                message: 'No internet connection',
+            };
+        }
+
+        // Backend responded with an error status (4xx / 5xx)
         return {
             success: false,
-            error: error?.message || 'Unknown error',
+            type: 'SERVER_ERROR',
+            status: error.response?.status,
+            message: error.response?.data?.message || 'Server error',
         };
     }
 }

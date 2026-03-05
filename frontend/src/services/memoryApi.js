@@ -1,45 +1,48 @@
-import client from '../api/client';
+import api, { safeRequest } from './apiClient';
 
 /**
- * Fetch the daily memory for a specific date
+ * Fetch the daily memory for a specific date.
+ * Returns null if no entry exists for that date or if the request fails.
  */
 export const getDailyMemory = async (date) => {
-    try {
-        const dateStr = date instanceof Date ? date.toISOString() : date;
-        const response = await client.get(`/memory/daily/${dateStr}`);
-        return response.data.data;
-    } catch (error) {
-        if (error.response && error.response.status === 404) {
-            return null;
-        }
-        console.error('getDailyMemory error:', error);
-        throw error;
+    const dateStr = date instanceof Date ? date.toISOString() : date;
+    const result = await safeRequest(() => api.get(`/memory/daily/${dateStr}`));
+    if (!result.success) {
+        // 404 = no memory for that date, treat as null (expected case)
+        if (result.status === 404) return null;
+        console.warn('getDailyMemory failed:', result.type);
+        return null;
     }
+    return result.data.data;
 };
 
 /**
- * Fetch a list of recent daily memories (paginated)
+ * Fetch a list of recent daily memories (paginated).
+ * Returns an empty page shape on failure so the list renders empty without crashing.
  */
 export const getMemories = async (page = 1, limit = 10) => {
-    try {
-        const response = await client.get(`/memory/daily?page=${page}&limit=${limit}`);
-        return response.data;
-    } catch (error) {
-        console.error('getMemories error:', error);
-        throw error;
+    const result = await safeRequest(() =>
+        api.get(`/memory/daily?page=${page}&limit=${limit}`)
+    );
+    if (!result.success) {
+        console.warn('getMemories failed:', result.type);
+        return { data: [], pagination: { current: 1, pages: 0 } };
     }
+    return result.data;
 };
 
 /**
- * Submit a handwritten journal entry for AI analysis and storage
+ * Submit a handwritten journal entry for AI analysis and storage.
+ * Throws on failure so the calling screen can surface an error Alert to the user.
  * @param {{ text: string, moodScore: number, date?: string }} params
  */
 export const createJournalEntry = async ({ text, moodScore, date }) => {
-    try {
-        const response = await client.post('/memory/journal', { text, moodScore, date });
-        return response.data.data;
-    } catch (error) {
-        console.error('createJournalEntry error:', error);
-        throw error;
+    const result = await safeRequest(() =>
+        api.post('/memory/journal', { text, moodScore, date })
+    );
+    if (!result.success) {
+        console.warn('createJournalEntry failed:', result.type);
+        throw new Error(result.message || 'Failed to save journal entry');
     }
+    return result.data.data;
 };
