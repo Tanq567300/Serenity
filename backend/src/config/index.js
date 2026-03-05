@@ -7,6 +7,7 @@ const config = {
     encryptionSecret: process.env.ENCRYPTION_SECRET,
     openaiApiKey: process.env.OPENAI_API_KEY,
     geminiApiKey: process.env.GEMINI_API_KEY,
+    openRouterApiKey: process.env.OPENROUTER_API_KEY,
     env: process.env.NODE_ENV || 'development',
 };
 

@@ -4,9 +4,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import ScreenBackground from '../components/ScreenBackground';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import axios from 'axios';
-import { API_URL } from '../config';
-import * as SecureStore from 'expo-secure-store';
+import api, { safeRequest } from '../services/apiClient';
 
 export default function JournalEntryScreen() {
     const navigation = useNavigation();
@@ -24,17 +22,20 @@ export default function JournalEntryScreen() {
         setErrorMsg(null);
 
         try {
-            const token = await SecureStore.getItemAsync('accessToken');
+            const result = await safeRequest(() =>
+                api.post('/mood/journal', {
+                    sliderScore,
+                    selectedMoodLabel,
+                    journalText: journalText.trim(),
+                })
+            );
 
-            const response = await axios.post(`${API_URL}/mood/journal`, {
-                sliderScore,
-                selectedMoodLabel,
-                journalText: journalText.trim()
-            }, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
+            if (!result.success) {
+                setErrorMsg('Network error. Please try again.');
+                return;
+            }
+
+            const response = { data: result.data };
 
             if (response.data.success) {
                 // Return to Home Screen directly

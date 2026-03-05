@@ -48,19 +48,31 @@ const useChatStore = create((set, get) => ({
             const data = await sendMessage(sessionId, messageText);
             // data.data { reply, isCrisis, emotion, resources }
 
-            const aiMsg = {
-                id: (Date.now() + 1).toString(),
-                role: 'assistant',
-                content: data.data.reply,
-                isCrisis: data.data.isCrisis,
-                emotion: data.data.emotion,
-                resources: data.data.resources, // If crisis
-                timestamp: new Date().toISOString()
-            };
+            const responseData = data.data;
+            const isBreathingRedirect = responseData.type === 'breathing_redirect';
+
+            const aiMsg = isBreathingRedirect
+                ? {
+                    id: (Date.now() + 1).toString(),
+                    role: 'assistant',
+                    type: 'breathing_redirect',
+                    exerciseId: responseData.exerciseId,
+                    content: responseData.message,
+                    timestamp: new Date().toISOString(),
+                }
+                : {
+                    id: (Date.now() + 1).toString(),
+                    role: 'assistant',
+                    content: responseData.reply,
+                    isCrisis: responseData.isCrisis,
+                    emotion: responseData.emotion,
+                    resources: responseData.resources,
+                    timestamp: new Date().toISOString(),
+                };
 
             set(state => ({
                 messages: [...state.messages, aiMsg],
-                isCrisis: data.data.isCrisis,
+                isCrisis: responseData.isCrisis || false,
                 isTyping: false
             }));
 

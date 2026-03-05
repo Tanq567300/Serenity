@@ -1,15 +1,14 @@
-import client from '../api/client';
+import api, { safeRequest } from './apiClient';
 
 /**
  * Fetch aggregated dashboard data
- * @returns {Promise<Object>} Dashboard data (userName, moodScore, quote, latestJournal)
+ * @returns {Promise<Object|null>} Dashboard data (userName, moodScore, quote, latestJournal), or null on failure
  */
 export const getDashboardData = async () => {
-    try {
-        const response = await client.get('/dashboard');
-        return response.data.data;
-    } catch (error) {
-        console.error('getDashboardData error:', error);
-        throw error;
+    const result = await safeRequest(() => api.get('/dashboard'));
+    if (!result.success) {
+        console.warn('getDashboardData failed:', result.type);
+        return null;
     }
+    return result.data.data;
 };

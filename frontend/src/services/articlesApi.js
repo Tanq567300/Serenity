@@ -1,4 +1,4 @@
-import client from '../api/client';
+import api, { safeRequest } from './apiClient';
 
 /**
  * Fetch mood-personalized RSS articles from the backend.
@@ -6,11 +6,10 @@ import client from '../api/client';
  * @returns {Promise<{ articles: Array, cacheStatus: string }>}
  */
 export const getPersonalizedArticles = async () => {
-    try {
-        const response = await client.get('/articles/personalized');
-        return response.data;
-    } catch (error) {
-        console.error('getPersonalizedArticles error:', error);
-        throw error;
+    const result = await safeRequest(() => api.get('/articles/personalized'));
+    if (!result.success) {
+        console.warn('getPersonalizedArticles failed:', result.type);
+        return { articles: [], cacheStatus: null };
     }
+    return result.data;
 };

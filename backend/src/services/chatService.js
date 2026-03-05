@@ -80,32 +80,52 @@ async function processUserMessage(userId, sessionId, messageText) {
     }));
 
     // 5. Generate AI Response
-    let aiResponseText;
+    let aiResponse;
     try {
-        aiResponseText = await aiService.generateChatResponse({
+        aiResponse = await aiService.generateChatResponse({
             message: messageText,
             sessionContext: context
         });
     } catch (error) {
+        // generateChatResponse has a three-level cascade and should not throw,
+        // but guard here as a last resort.
         console.error('AI Generation Failed:', error);
-        // Fallback response? Or throw?
-        // Fallback is better for user experience
-        aiResponseText = "I apologize, I'm having trouble processing that right now. Could you try again?";
+        aiResponse = {
+            type: 'breathing_redirect',
+            exerciseId: 'box444',
+            message: "It might help to pause and take a few slow breaths.",
+        };
     }
 
-    // 6. Save AI Response
+    // If the cascade fell through to a breathing redirect, handle it before
+    // saving — store the human-readable message in history, not raw JSON.
+    const isBreathingRedirect =
+        typeof aiResponse === 'object' && aiResponse.type === 'breathing_redirect';
+
+    const contentToStore = isBreathingRedirect ? aiResponse.message : aiResponse;
+
+    // 6. Save AI Response (always save the plain-text content for history readability)
     const aiMessage = new ChatMessage({
         session: session._id,
         sender: 'assistant',
-        encryptedContent: encrypt(aiResponseText),
-        // AI emotion? Maybe infer from its own text? For now, use neutral or skip.
-        // We'll leave it default or null.
+        encryptedContent: encrypt(contentToStore),
         timestamp: new Date()
     });
     await aiMessage.save();
 
+    // Return breathing redirect or normal reply
+    if (isBreathingRedirect) {
+        return {
+            type: 'breathing_redirect',
+            exerciseId: aiResponse.exerciseId,
+            message: aiResponse.message,
+            isCrisis: false,
+            emotion: emotionData
+        };
+    }
+
     return {
-        reply: aiResponseText,
+        reply: aiResponse,
         isCrisis: false,
         emotion: emotionData
     };
