@@ -19,7 +19,7 @@ const BackHeader = ({ title, onBack }) => (
 );
 
 const AccountSettingsScreen = ({ onBack, user }) => {
-    const [name, setName] = useState(user?.name || '');
+    const [name, setName] = useState(user?.username || user?.name || '');
     const [email, setEmail] = useState(user?.email || 'testuser@serenity.com');
     return (
         <SafeAreaView style={styles.container}>
@@ -141,7 +141,7 @@ const ProfileScreen = () => {
     const { logout, user } = useAuthStore();
     const [subScreen, setSubScreen] = useState(null); // null | 'account' | 'notifications' | 'security' | 'help'
 
-    const userName = user?.name || user?.email?.split('@')[0] || 'You';
+    const userName = user?.username || user?.name || user?.email?.split('@')[0] || 'You';
     const joinDate = user?.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'Recently';
 
     // Render sub-screens
@@ -167,7 +167,7 @@ const ProfileScreen = () => {
                 <View style={styles.profileSection}>
                     <View style={styles.avatarContainer}>
                         <Image
-                            source={{ uri: 'https://lh3.googleusercontent.com/aida-public/AB6AXuC4l4ZP8QfEHYeysThHgKnBfRF9d7tgFOwAYcWqzWU-UVr_jfz00nS6Y0NsMoFp5y5sl5zhWUZcgG3eD1sWU1ysepDNXOF3FNyItBcBK_n4RXhEGHnldYhDFM6b09ffoW_KlqDt4JgXbkBpBSkc9hgu4dZPh2Ez5Xc3fl7t4w3xBnT6oiq5Hrof7JdcoanS3Qyb116pVR4GtUcj1F91muWP6Ypr0AL6_FKitWFfBTWuUiSFItqywaI_K3xxc1dVheQz2p82VFLDrx2n' }}
+                            source={{ uri: user?.profilePic || 'https://lh3.googleusercontent.com/aida-public/AB6AXuC4l4ZP8QfEHYeysThHgKnBfRF9d7tgFOwAYcWqzWU-UVr_jfz00nS6Y0NsMoFp5y5sl5zhWUZcgG3eD1sWU1ysepDNXOF3FNyItBcBK_n4RXhEGHnldYhDFM6b09ffoW_KlqDt4JgXbkBpBSkc9hgu4dZPh2Ez5Xc3fl7t4w3xBnT6oiq5Hrof7JdcoanS3Qyb116pVR4GtUcj1F91muWP6Ypr0AL6_FKitWFfBTWuUiSFItqywaI_K3xxc1dVheQz2p82VFLDrx2n' }}
                             style={styles.avatar}
                         />
                         <View style={styles.verifiedBadge}>
