@@ -127,7 +127,7 @@ const PatternDashboardScreen = () => {
                         <MaterialIcons name="insights" size={40} color="rgba(54,226,54,0.4)" />
                         <Text style={styles.placeholderTitle}>Building Your Patterns 🌱</Text>
                         <Text style={styles.placeholderText}>
-                            Write journal entries for a few days and Serenity will surface personalised mood trends, emotional patterns, and recurring themes.
+                            Write journal entries for a few days and Mansik will surface personalised mood trends, emotional patterns, and recurring themes.
                         </Text>
                         <View style={styles.milestoneRow}>
                             {[1, 3, 7, 14, 30].map(n => (

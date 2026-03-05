@@ -32,13 +32,13 @@ const LoginScreen = ({ navigation }) => {
                     <View style={styles.logoCircle}>
                         <Text style={styles.logoText}>S</Text>
                     </View>
-                    <Text style={styles.title}>Serenity</Text>
+                    <Text style={styles.title}>Mansik</Text>
                     <Text style={styles.subtitle}>Find your inner peace.</Text>
                 </View>
 
                 <View style={styles.form}>
                     <Input
-                        placeholder="hello@serenity.com"
+                        placeholder="hello@mansik.com"
                         value={email}
                         onChangeText={setEmail}
                         keyboardType="email-address"

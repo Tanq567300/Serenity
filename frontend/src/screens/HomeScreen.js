@@ -125,7 +125,7 @@ const HomeScreen = () => {
                 {/* Top Bar */}
                 <View style={styles.header}>
                     <View>
-                        <Text style={styles.brandText}>SERENITY</Text>
+                        <Text style={styles.brandText}>MANSIK</Text>
                         <Text style={styles.greetingText}>Good Morning, {userName}</Text>
                     </View>
                     <TouchableOpacity onPress={() => navigation.navigate('Profile')}>

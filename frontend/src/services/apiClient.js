@@ -61,7 +61,7 @@ export async function safeRequest(requestFn, retries = 2) {
             return {
                 success: false,
                 type: 'BACKEND_DOWN',
-                message: 'Serenity server is currently unreachable',
+                message: 'Mansik server is currently unreachable',
             };
         }
 

@@ -20,7 +20,7 @@ const BackHeader = ({ title, onBack }) => (
 
 const AccountSettingsScreen = ({ onBack, user }) => {
     const [name, setName] = useState(user?.username || user?.name || '');
-    const [email, setEmail] = useState(user?.email || 'testuser@serenity.com');
+    const [email, setEmail] = useState(user?.email || 'testuser@mansik.com');
     return (
         <SafeAreaView style={styles.container}>
             <BackHeader title="Account Settings" onBack={onBack} />
@@ -91,7 +91,7 @@ const SecurityScreen = ({ onBack }) => (
                 <TouchableOpacity
                     key={i}
                     style={styles.menuItem}
-                    onPress={() => item.danger && Alert.alert('Delete Data', 'To delete your account and all data, contact support@serenity.app')}
+                    onPress={() => item.danger && Alert.alert('Delete Data', 'To delete your account and all data, contact support@mansik.app')}
                 >
                     <View style={styles.menuIconBox}>
                         <MaterialIcons name={item.icon} size={22} color={item.danger ? '#ef4444' : '#36e236'} />
@@ -111,7 +111,7 @@ const HelpScreen = ({ onBack }) => (
             <View style={styles.infoCard}>
                 <MaterialIcons name="support-agent" size={32} color="#36e236" />
                 <Text style={styles.infoTitle}>We're here to help</Text>
-                <Text style={styles.infoDesc}>Reach us anytime at support@serenity.app</Text>
+                <Text style={styles.infoDesc}>Reach us anytime at support@mansik.app</Text>
             </View>
             {[
                 { icon: 'article', label: 'FAQs', desc: 'Common questions answered' },
@@ -208,7 +208,7 @@ const ProfileScreen = () => {
                         <MaterialIcons name="logout" size={20} color="#36e236" style={{ marginRight: 8 }} />
                         <Text style={styles.logoutText}>Logout</Text>
                     </TouchableOpacity>
-                    <Text style={styles.versionText}>SERENITY v2.5.0</Text>
+                    <Text style={styles.versionText}>MANSIK v2.5.0</Text>
                 </View>
             </ScrollView>
         </SafeAreaView>

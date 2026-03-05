@@ -42,7 +42,7 @@ async function _generateWithOpenRouter(systemPrompt, messages, modelId) {
                 Authorization: `Bearer ${config.openRouterApiKey}`,
                 'Content-Type': 'application/json',
                 'HTTP-Referer': 'http://localhost:8081',
-                'X-Title': 'Serenity',
+                'X-Title': 'Mansik',
             },
             timeout: 30000,
         }
@@ -87,22 +87,22 @@ async function generateChatResponse({ message, sessionContext = [] }) {
 
     const FREE_MODELS = [
 
-  {
-    id: "meta-llama/llama-3.2-3b-instruct:free",
-    label: "Llama 3.2 3B"
-  },
+        {
+            id: "meta-llama/llama-3.2-3b-instruct:free",
+            label: "Llama 3.2 3B"
+        },
 
-  {
-    id: "google/gemma-3-4b-it:free",
-    label: "Gemma 3 4B"
-  },
+        {
+            id: "google/gemma-3-4b-it:free",
+            label: "Gemma 3 4B"
+        },
 
-  {
-    id: "deepseek/deepseek-chat:free",
-    label: "DeepSeek Chat"
-  }
+        {
+            id: "deepseek/deepseek-chat:free",
+            label: "DeepSeek Chat"
+        }
 
-];
+    ];
 
     const openRouterMessages = [
 

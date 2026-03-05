@@ -246,7 +246,7 @@ const ChatScreen = ({ navigation, route }) => {
                         </View>
                         <View style={styles.listeningRow}>
                             <View style={styles.listeningDot} />
-                            <Text style={styles.listeningText}>Serenity AI is listening...</Text>
+                            <Text style={styles.listeningText}>Mansik AI is listening...</Text>
                         </View>
                     </View>
 

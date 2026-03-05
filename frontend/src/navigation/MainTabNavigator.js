@@ -19,7 +19,7 @@ const TABS = [
 
 // ── Dark pill color (same as bar, so active bubble is seamlessly connected) ──
 const BAR_COLOR = '#ffffff';
-const BUBBLE_COLOR = '#36e236';   // Serenity primary green
+const BUBBLE_COLOR = '#36e236';   // Mansik primary green
 const ICON_ACTIVE = '#ffffff';
 const ICON_INACTIVE = '#94a3b8';   // slate-400
 const LABEL_ACTIVE = '#36e236';

@@ -32,7 +32,7 @@ const RegisterScreen = ({ navigation }) => {
             <View style={styles.content}>
                 <View style={styles.header}>
                     <Text style={styles.title}>Create Account</Text>
-                    <Text style={styles.subtitle}>Join Serenity today.</Text>
+                    <Text style={styles.subtitle}>Join Mansik today.</Text>
                 </View>
 
                 <View style={styles.form}>

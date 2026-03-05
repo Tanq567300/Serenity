@@ -192,7 +192,7 @@ const JournalEditor = ({ onBack, onSaveSuccess }) => {
                 {/* Info Card */}
                 <View style={styles.infoCard}>
                     <MaterialIcons name="psychology" size={20} color="#36e236" />
-                    <Text style={styles.infoText}>Serenity AI will analyse your entry, extract tags, and build your insights — all privately encrypted.</Text>
+                    <Text style={styles.infoText}>Mansik AI will analyse your entry, extract tags, and build your insights — all privately encrypted.</Text>
                 </View>
             </ScrollView>
         </SafeAreaView>

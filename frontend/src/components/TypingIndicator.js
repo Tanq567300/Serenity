@@ -24,7 +24,7 @@ const TypingIndicator = () => {
     return (
         <View style={styles.container}>
             <Animated.Text style={[styles.text, { opacity }]}>
-                Serenity is writing...
+                Mansik is writing...
             </Animated.Text>
         </View>
     );

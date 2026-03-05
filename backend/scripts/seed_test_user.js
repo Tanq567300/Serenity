@@ -25,7 +25,7 @@ const seedData = async () => {
         console.log('MongoDB Connected');
 
         // 1. Create Test User
-        const email = 'testuser@serenity.com';
+        const email = 'testuser@mansik.com';
         const password = 'password123';
 
         let user = await User.findOne({ email });

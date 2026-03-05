@@ -7,7 +7,7 @@
 </p>
 
 <h1 align="center">
-  🌿 Serenity
+  🌿 Mansik
 </h1>
 
 <p align="center">
@@ -47,7 +47,7 @@
 
 ```
 +----------------------------------------------------------------------+
-|                       SERENITY MOBILE APP                            |
+|                       Mansik MOBILE APP                            |
 |                React Native (Expo) + Zustand                         |
 |                                                                      |
 |  +----------+  +----------+  +----------+  +----------+              |
@@ -111,7 +111,7 @@
 
 ## 🧠 Three-Tier Memory System
 
-One of Serenity's most distinctive features is its **layered memory architecture** that mimics how humans process emotional experiences:
+One of Mansik's most distinctive features is its **layered memory architecture** that mimics how humans process emotional experiences:
 
 ### ⚡ Short-Term Memory
 > Last **10 chat messages** serve as a sliding-window context for the AI, enabling natural multi-turn conversations without losing recent context.
@@ -134,7 +134,7 @@ One of Serenity's most distinctive features is its **layered memory architecture
 
 ## 🛡️ Crisis Detection
 
-Serenity takes user safety seriously with a **zero-latency, rule-based crisis detection system** that runs **before** any AI processing:
+Mansik takes user safety seriously with a **zero-latency, rule-based crisis detection system** that runs **before** any AI processing:
 
 - 🔍 &nbsp;**50+ phrase patterns** covering suicidal ideation, self-harm, hopelessness, and farewell signals
 - ⚡ &nbsp;**Instant response** — no network call to external AI; regex-based O(1) matching
@@ -146,7 +146,7 @@ Serenity takes user safety seriously with a **zero-latency, rule-based crisis de
 
 ## 🎨 Design Philosophy
 
-Serenity's UI is **entirely hand-crafted** — no external component libraries.
+Mansik's UI is **entirely hand-crafted** — no external component libraries.
 
 | Principle | Implementation |
 |-----------|---------------|
@@ -264,8 +264,8 @@ Serenity's UI is **entirely hand-crafted** — no external component libraries.
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/serenity.git
-cd serenity
+git clone https://github.com/your-username/Mansik.git
+cd Mansik
 ```
 
 ### 2. Backend Setup
@@ -324,7 +324,7 @@ Scan the QR code with **Expo Go** (Android) or the Camera app (iOS).
 ## 📁 Project Structure
 
 ```
-serenity/
+Mansik/
 ├── backend/
 │   ├── server.js                 # Entry point
 │   ├── src/
@@ -444,7 +444,7 @@ Contributions are welcome! Here's how to get started:
 
 ## ⚠️ Disclaimer
 
-Serenity is a **wellness companion tool** designed to support emotional well-being. It is **not** a substitute for professional mental health care. If you or someone you know is in crisis, please contact:
+Mansik is a **wellness companion tool** designed to support emotional well-being. It is **not** a substitute for professional mental health care. If you or someone you know is in crisis, please contact:
 
 - **iCall** — 9152987821
 - **Vandrevala Foundation** — 1860-2662-345
@@ -463,5 +463,5 @@ This project is licensed under the **ISC License** — see the [LICENSE](LICENSE
   <br/>
   <strong>Built with 💚 for mental wellness</strong>
   <br/><br/>
-  <img src="https://img.shields.io/badge/🌿_Serenity-Find_Your_Inner_Peace-36e236?style=for-the-badge" alt="Serenity" />
+  <img src="https://img.shields.io/badge/🌿_Mansik-Find_Your_Inner_Peace-36e236?style=for-the-badge" alt="Mansik" />
 </p>

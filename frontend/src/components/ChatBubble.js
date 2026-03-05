@@ -55,7 +55,7 @@ const ChatBubble = ({ role, content, isCrisis, resources }) => {
     return (
         <View style={styles.aiRow}>
             <View style={styles.aiMeta}>
-                <Text style={styles.serenityLabel}>SERENITY</Text>
+                <Text style={styles.mansikLabel}>MANSIK</Text>
             </View>
             <View style={styles.aiBubble}>
                 <Text style={styles.aiText}>{content}</Text>
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
         marginLeft: 16,
         marginBottom: 4,
     },
-    serenityLabel: {
+    mansikLabel: {
         fontSize: 10,
         fontWeight: '700',
         letterSpacing: 1.6,
