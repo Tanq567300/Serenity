@@ -50,14 +50,22 @@ export async function safeRequest(requestFn, retries = 2) {
         }
 
         // All retries exhausted — classify the final error.
-        if (error.code === 'ECONNABORTED' || error.code === 'ETIMEDOUT') {
+        // BACKEND_DOWN: axios reached the network but the server didn't respond
+        // (connection refused, timeout, or explicit "Network Error" from axios).
+        if (
+            error.code === 'ECONNABORTED' ||
+            error.code === 'ETIMEDOUT' ||
+            error.message?.includes('timeout') ||
+            error.message?.includes('Network Error')
+        ) {
             return {
                 success: false,
-                type: 'TIMEOUT_ERROR',
-                message: 'Request timed out',
+                type: 'BACKEND_DOWN',
+                message: 'Serenity server is currently unreachable',
             };
         }
 
+        // NETWORK_ERROR: device has no internet connection at all
         return {
             success: false,
             type: 'NETWORK_ERROR',
