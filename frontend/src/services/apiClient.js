@@ -1,11 +1,17 @@
 import client from '../api/client';
 
+/** Resolves after `ms` milliseconds — used between retry attempts. */
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 /**
  * Safe request wrapper — the single entry point for all API calls.
  *
- * Every network call in the app should go through this function so that
- * future resilience features (retries, offline detection, AI fallbacks)
- * can be added here without touching individual screens or services.
+ * Automatically retries transient failures (network drops, timeouts) up to
+ * `retries` times with a 1-second pause between attempts. Server errors
+ * (4xx / 5xx) are NOT retried — the backend responded correctly, so there
+ * is nothing to gain from repeating the request.
  *
  * The underlying `client` is the existing axios instance from api/client.js,
  * which already handles auth token injection and 401 auto-refresh.
@@ -15,7 +21,7 @@ import client from '../api/client';
  *   if (!result.success) throw new Error(result.error)
  *   return result.data
  */
-export async function safeRequest(requestFn) {
+export async function safeRequest(requestFn, retries = 2) {
     try {
         const response = await requestFn();
         return {
@@ -25,7 +31,25 @@ export async function safeRequest(requestFn) {
     } catch (error) {
         console.warn('API Error:', error?.message);
 
-        // Request timed out
+        // Server responded with an error status (4xx / 5xx).
+        // Do NOT retry — the backend handled the request; repeating it won't help.
+        if (error.response) {
+            return {
+                success: false,
+                type: 'SERVER_ERROR',
+                status: error.response.status,
+                message: error.response.data?.message || 'Server error',
+            };
+        }
+
+        // Transient failure (timeout or no response) — retry if attempts remain.
+        if (retries > 0) {
+            console.warn(`Retrying request... (${retries} ${retries === 1 ? 'retry' : 'retries'} left)`);
+            await delay(1000);
+            return safeRequest(requestFn, retries - 1);
+        }
+
+        // All retries exhausted — classify the final error.
         if (error.code === 'ECONNABORTED' || error.code === 'ETIMEDOUT') {
             return {
                 success: false,
@@ -34,21 +58,10 @@ export async function safeRequest(requestFn) {
             };
         }
 
-        // No response received — device offline or server unreachable
-        if (!error.response) {
-            return {
-                success: false,
-                type: 'NETWORK_ERROR',
-                message: 'No internet connection',
-            };
-        }
-
-        // Backend responded with an error status (4xx / 5xx)
         return {
             success: false,
-            type: 'SERVER_ERROR',
-            status: error.response?.status,
-            message: error.response?.data?.message || 'Server error',
+            type: 'NETWORK_ERROR',
+            message: 'No internet connection',
         };
     }
 }
