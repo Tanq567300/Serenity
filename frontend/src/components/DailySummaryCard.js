@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 
 // Emotion → icon + color mapping
@@ -20,7 +20,7 @@ const getMoodColor = (score) => {
     return '#ef4444';
 };
 
-const DailySummaryCard = ({ memory, style }) => {
+const DailySummaryCard = ({ memory, style, onStartBreathing }) => {
     // Empty state — small quiet placeholder
     if (!memory) {
         return (
@@ -32,6 +32,11 @@ const DailySummaryCard = ({ memory, style }) => {
     }
 
     const { summary, dominantEmotion, averageMoodScore, tags, keyStressors, date } = memory;
+    const positiveEmotions = ['happy', 'calm', 'neutral', 'grateful'];
+    const shouldSuggestBreathing =
+        averageMoodScore != null &&
+        averageMoodScore <= 4 &&
+        !positiveEmotions.includes((dominantEmotion || '').toLowerCase());
     const formattedDate = new Date(date).toLocaleDateString(undefined, {
         weekday: 'short', month: 'short', day: 'numeric'
     });
@@ -97,6 +102,22 @@ const DailySummaryCard = ({ memory, style }) => {
                             · {keyStressors.slice(0, 2).join(', ')}
                         </Text>
                     )}
+                </View>
+            )}
+
+            {/* ── Breathing suggestion — only when mood is low ── */}
+            {shouldSuggestBreathing && onStartBreathing && (
+                <View style={styles.breathingSuggestion}>
+                    <Text style={styles.breathingSuggestionText}>
+                        Try a short breathing reset.
+                    </Text>
+                    <TouchableOpacity
+                        style={styles.breathingSuggestionButton}
+                        onPress={onStartBreathing}
+                        activeOpacity={0.85}
+                    >
+                        <Text style={styles.breathingSuggestionButtonText}>Start Breathing</Text>
+                    </TouchableOpacity>
                 </View>
             )}
         </View>
@@ -225,6 +246,31 @@ const styles = StyleSheet.create({
         fontSize: 11,
         color: '#94a3b8',
         flexShrink: 1,
+    },
+
+    // Breathing suggestion
+    breathingSuggestion: {
+        marginTop: 12,
+        paddingTop: 12,
+        borderTopWidth: 1,
+        borderTopColor: 'rgba(0,0,0,0.05)',
+    },
+    breathingSuggestionText: {
+        fontSize: 14,
+        color: '#4b5563',
+        marginBottom: 8,
+    },
+    breathingSuggestionButton: {
+        alignSelf: 'flex-start',
+        backgroundColor: '#36e236',
+        paddingVertical: 8,
+        paddingHorizontal: 14,
+        borderRadius: 10,
+    },
+    breathingSuggestionButtonText: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: '#0e1b0e',
     },
 });
 

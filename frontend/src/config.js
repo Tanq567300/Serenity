@@ -1,2 +1,5 @@
+import Constants from 'expo-constants'
 
-export const API_URL = 'http://192.168.1.7:5000/api';
+const { API_URL, ENV } = Constants.expoConfig.extra
+
+export { API_URL, ENV }

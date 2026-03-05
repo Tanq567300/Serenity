@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "node scripts/update_ip.js && expo start",
-    "start": "expo start",
+    "dev": "cross-env ENVFILE=.env.development expo start",
+    "staging": "cross-env ENVFILE=.env.staging expo start",
+    "prod": "cross-env ENVFILE=.env.production expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web"
@@ -33,5 +34,9 @@
     "react-native-svg": "15.12.1",
     "zustand": "^5.0.11"
   },
-  "private": true
+  "private": true,
+  "devDependencies": {
+    "cross-env": "^10.1.0",
+    "dotenv": "^17.3.1"
+  }
 }
